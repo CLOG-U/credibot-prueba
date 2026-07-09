@@ -17,9 +17,9 @@ Documento consolidado de tareas basado en:
 
 | Fase | Tareas | Hechas | Pendientes | Sin hacer |
 |---|---|---|---|---|
-| Fase 1 — Backend FastAPI + Supabase | 21 | 2 | 0 | 19 |
+| Fase 1 — Backend FastAPI + Supabase | 21 | 3 | 0 | 18 |
 | Fase 2 — Panel administrativo Streamlit | 8 | 0 | 0 | 8 |
-| **Total** | **29** | **2** | **0** | **27** |
+| **Total** | **29** | **3** | **0** | **26** |
 
 ---
 
@@ -56,14 +56,14 @@ Documento consolidado de tareas basado en:
 
 ### Tarea 3 — Configurar variables de entorno *(Tarea 2 del doc. backend)*
 
-**Estado:** Sin hacer
+**Estado:** Hecho
 **Objetivo:** centralizar la configuración del proyecto.
 **Archivos:** `app/core/config.py`, `.env.example`
 
-- [ ] Instalar `python-dotenv` y `pydantic-settings`
-- [ ] Crear clase de configuración
-- [ ] Leer variables de entorno
-- [ ] Validar que Supabase y WhatsApp puedan configurarse desde `.env`
+- [x] Instalar `python-dotenv` y `pydantic-settings`
+- [x] Crear clase de configuración
+- [x] Leer variables de entorno
+- [x] Validar que Supabase y WhatsApp puedan configurarse desde `.env`
 
 ---
 
