@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Form, HTTPException, Request, Response
+from fastapi import APIRouter, HTTPException, Request, Response
 
 from app.core.config import settings
 from app.schemas.whatsapp import extract_twilio_message
@@ -50,20 +50,17 @@ def whatsapp_webhook_status():
 
 
 @router.post("/whatsapp")
-async def receive_whatsapp_webhook(
-    request: Request,
-    From: str = Form(...),
-    Body: str = Form(default=""),
-    MessageSid: str = Form(default=""),
-):
-    form_data = {
-        "From": From,
-        "Body": Body,
-        "MessageSid": MessageSid,
-    }
+async def receive_whatsapp_webhook(request: Request):
+    form = await request.form()
+    form_data = {key: str(value) for key, value in form.items()}
+
     _validate_twilio_signature(request, form_data)
 
-    incoming = extract_twilio_message(From, Body, MessageSid or None)
+    incoming = extract_twilio_message(
+        form_data.get("From", ""),
+        form_data.get("Body", ""),
+        form_data.get("MessageSid") or None,
+    )
     if not incoming:
         return Response(content="", media_type="text/plain")
 
