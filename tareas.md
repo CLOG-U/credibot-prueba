@@ -18,8 +18,8 @@ Documento consolidado de tareas basado en:
 | Fase | Tareas | Hechas | Pendientes | Sin hacer |
 |---|---|---|---|---|
 | Fase 1 — Backend FastAPI + Supabase | 21 | 21 | 0 | 0 |
-| Fase 2 — Panel administrativo Streamlit | 8 | 7 | 0 | 1 |
-| **Total** | **29** | **28** | **0** | **1** |
+| Fase 2 — Panel administrativo Streamlit | 8 | 8 | 0 | 0 |
+| **Total** | **29** | **29** | **0** | **0** |
 
 ---
 
@@ -423,14 +423,14 @@ Documento consolidado de tareas basado en:
 
 ### Tarea 29 — Preparar ejecución local del panel *(Tarea 08 del doc. Streamlit)*
 
-**Estado:** Sin hacer
+**Estado:** Hecho
 **Objetivo:** documentar y probar cómo ejecutar el dashboard localmente (`streamlit run dashboard/app.py`).
 
-- [ ] Instalar dependencias
-- [ ] Configurar `.env`
-- [ ] Ejecutar Streamlit
-- [ ] Verificar conexión a Supabase
-- [ ] Probar filtros y vistas
+- [x] Instalar dependencias
+- [x] Configurar `.env`
+- [x] Ejecutar Streamlit
+- [x] Verificar conexión a Supabase
+- [x] Probar filtros y vistas
 
 ---
 
