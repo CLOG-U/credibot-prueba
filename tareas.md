@@ -18,8 +18,8 @@ Documento consolidado de tareas basado en:
 | Fase | Tareas | Hechas | Pendientes | Sin hacer |
 |---|---|---|---|---|
 | Fase 1 — Backend FastAPI + Supabase | 21 | 21 | 0 | 0 |
-| Fase 2 — Panel administrativo Streamlit | 8 | 3 | 0 | 5 |
-| **Total** | **29** | **24** | **0** | **5** |
+| Fase 2 — Panel administrativo Streamlit | 8 | 4 | 0 | 4 |
+| **Total** | **29** | **25** | **0** | **4** |
 
 ---
 
@@ -368,16 +368,16 @@ Documento consolidado de tareas basado en:
 
 ### Tarea 25 — Crear pantalla de solicitudes *(Tarea 04 del doc. Streamlit)*
 
-**Estado:** Sin hacer
+**Estado:** Hecho
 **Objetivo:** crear una página para consultar y filtrar solicitudes de crédito.
 **Archivos:** `dashboard/pages/2_Solicitudes.py`
 
-- [ ] Crear archivo `pages/2_Solicitudes.py`
-- [ ] Consultar solicitudes desde Supabase
-- [ ] Mostrar tabla completa
-- [ ] Agregar filtro por resultado (Todos, preaprobado, observado, no_cumple)
-- [ ] Agregar filtro por derivación (Todos, Derivados, No derivados)
-- [ ] Agregar botón para descargar CSV
+- [x] Crear archivo `pages/2_Solicitudes.py`
+- [x] Consultar solicitudes desde Supabase
+- [x] Mostrar tabla completa
+- [x] Agregar filtro por resultado (Todos, preaprobado, observado, no_cumple)
+- [x] Agregar filtro por derivación (Todos, Derivados, No derivados)
+- [x] Agregar botón para descargar CSV
 
 ---
 
