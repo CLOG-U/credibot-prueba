@@ -17,9 +17,9 @@ Documento consolidado de tareas basado en:
 
 | Fase | Tareas | Hechas | Pendientes | Sin hacer |
 |---|---|---|---|---|
-| Fase 1 — Backend FastAPI + Supabase | 21 | 11 | 0 | 10 |
+| Fase 1 — Backend FastAPI + Supabase | 21 | 12 | 0 | 9 |
 | Fase 2 — Panel administrativo Streamlit | 8 | 0 | 0 | 8 |
-| **Total** | **29** | **11** | **0** | **18** |
+| **Total** | **29** | **12** | **0** | **17** |
 
 ---
 
@@ -173,16 +173,16 @@ Documento consolidado de tareas basado en:
 
 ### Tarea 12 — Crear plantillas de mensajes *(Tarea 11 del doc. backend)*
 
-**Estado:** Sin hacer
+**Estado:** Hecho
 **Objetivo:** centralizar los textos que enviará CrediBot.
 **Archivos:** `app/services/message_service.py`
 
-- [ ] Mensajes de bienvenida y menú (`welcome_message`)
-- [ ] Mensajes de solicitud de datos (`ask_name_message`, `ask_amount_message`, `ask_term_message`, `ask_income_message`)
-- [ ] Mensajes de error de validación (`invalid_amount_message`, `invalid_term_message`, `invalid_income_message`)
-- [ ] Mensaje de confirmación de datos (`confirm_data_message`)
-- [ ] Mensajes de resultado (`preapproved_message`, `observed_message`, `not_qualified_message`)
-- [ ] Mensajes de derivación y cierre (`handoff_message`, `finished_message`)
+- [x] Mensajes de bienvenida y menú (`welcome_message`)
+- [x] Mensajes de solicitud de datos (`ask_name_message`, `ask_amount_message`, `ask_term_message`, `ask_income_message`)
+- [x] Mensajes de error de validación (`invalid_amount_message`, `invalid_term_message`, `invalid_income_message`)
+- [x] Mensaje de confirmación de datos (`confirm_data_message`)
+- [x] Mensajes de resultado (`preapproved_message`, `observed_message`, `not_qualified_message`)
+- [x] Mensajes de derivación y cierre (`handoff_message`, `finished_message`)
 
 ---
 
