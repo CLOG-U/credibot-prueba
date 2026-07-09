@@ -242,7 +242,10 @@ def process_message(phone: str, text: str, raw_payload: dict[str, Any] | None = 
             if request:
                 summary = _build_summary_data(user, request)
                 response = message_service.confirm_data_message(summary)
-            next_state = CONFIRM_DATA
+                next_state = CONFIRM_DATA
+            else:
+                response = message_service.welcome_message()
+                next_state = MENU
 
     elif state == CONFIRM_DATA:
         is_valid, _ = validation_service.validate_confirmation(text)
