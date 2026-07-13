@@ -483,11 +483,11 @@ El MVP se considera completo cuando:
 | Sprint | Tareas P0 | Hechas | Pendientes |
 |---|---|---|---|
 | Preparación + EPIC-00 | 8 | 3 | 5 |
-| Sprint 1 — Datos y dominio | 35 | 12 | 23 |
+| Sprint 1 — Datos y dominio | 35 | 21 | 14 |
 | Sprint 2 — Tools, GPT, RAG | 28 | 0 | 28 |
 | Sprint 3 — WhatsApp, Redis, Admin | 29 | 0 | 29 |
 | Sprint 4 — DevOps y QA | 30 | 0 | 30 |
-| **Total v2** | **~130** | **15** | **~115** |
+| **Total v2** | **~130** | **24** | **~106** |
 
 ---
 
@@ -523,15 +523,15 @@ El MVP se considera completo cuando:
 
 ## EPIC-02 — Dominio crediticio (Sprint 1)
 
-- [ ] **DOM-01** — Implementar módulo 10 de cédula (P0)
-- [ ] **DOM-02** — Categorizar score 1–999 (P0)
-- [ ] **DOM-03** — Implementar mora, lista negra y sin historial (P0)
-- [ ] **DOM-04** — Calcular capacidad considerando deuda y gastos (P0)
-- [ ] **DOM-05** — Calcular cuota con sistema francés (P0)
-- [ ] **DOM-06** — Calcular monto máximo por categoría (P0)
-- [ ] **DOM-07** — Calcular preaprobado, observado y no_cumple (P0)
-- [ ] **DOM-08** — Crear tabla de decisión y casos límite (P0)
-- [ ] **DOM-09** — Versionar y documentar reglas ficticias (P0)
+- [x] **DOM-01** — Implementar módulo 10 de cédula (P0)
+- [x] **DOM-02** — Categorizar score 1–999 (P0)
+- [x] **DOM-03** — Implementar mora, lista negra y sin historial (P0)
+- [x] **DOM-04** — Calcular capacidad considerando deuda y gastos (P0)
+- [x] **DOM-05** — Calcular cuota con sistema francés (P0)
+- [x] **DOM-06** — Calcular monto máximo por categoría (P0)
+- [x] **DOM-07** — Calcular preaprobado, observado y no_cumple (P0)
+- [x] **DOM-08** — Crear tabla de decisión y casos límite (P0)
+- [x] **DOM-09** — Versionar y documentar reglas ficticias (P0)
 
 ---
 
@@ -609,4 +609,5 @@ El MVP se considera completo cuando:
 
 | Commit | Tarea(s) | Descripción | Fecha |
 |---|---|---|---|
+| 2 | DOM-01..09 | Dominio crediticio y validador de cédula | 2026-07-12 |
 | 1 | GOV-01,05 DATA-01..11 | Migraciones v2, seed y ADR arquitectura | 2026-07-12 |
