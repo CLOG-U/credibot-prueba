@@ -86,26 +86,42 @@ def ingest_all(persist_remote: bool = False) -> int:
 
     save_local_cache(enriched)
 
-    if persist_remote and settings.supabase_url:
+    if persist_remote and settings.supabase_url and settings.openai_api_key:
         try:
             from app.repositories.supabase_client import get_supabase_client
 
             client = get_supabase_client()
             for chunk in enriched:
-                doc = (
+                embedding = chunk.get("embedding", [])
+                if len(embedding) != 1536:
+                    embedding = generate_embedding(chunk["content"])
+                doc_lookup = (
                     client.table("rag_documents")
-                    .upsert({"title": chunk["title"], "source_path": chunk["source"]})
+                    .select("id")
+                    .eq("source_path", chunk["source"])
+                    .limit(1)
                     .execute()
                 )
-                doc_id = doc.data[0]["id"] if doc.data else None
-                if doc_id:
-                    client.table("rag_chunks").upsert(
-                        {
-                            "document_id": doc_id,
-                            "content": chunk["content"],
-                            "metadata": chunk["metadata"],
-                        }
-                    ).execute()
+                if doc_lookup.data:
+                    doc_id = doc_lookup.data[0]["id"]
+                else:
+                    doc_id = (
+                        client.table("rag_documents")
+                        .insert({"title": chunk["title"], "source_path": chunk["source"]})
+                        .execute()
+                        .data[0]["id"]
+                    )
+                client.table("rag_chunks").delete().eq("document_id", doc_id).eq(
+                    "metadata->>chunk_key", chunk["id"]
+                ).execute()
+                client.table("rag_chunks").insert(
+                    {
+                        "document_id": doc_id,
+                        "content": chunk["content"],
+                        "metadata": {**chunk["metadata"], "chunk_key": chunk["id"]},
+                        "embedding": embedding,
+                    }
+                ).execute()
         except Exception:
             pass
 

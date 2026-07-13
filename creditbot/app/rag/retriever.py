@@ -1,10 +1,10 @@
-"""Recuperación de fragmentos de políticas (vectorial + keywords)."""
+"""Recuperación de fragmentos de políticas (pgvector + local + keywords)."""
 import math
 import re
-from pathlib import Path
 from typing import Any
 
-from app.rag.ingest import CACHE_FILE, chunk_documents, generate_embedding, load_local_cache, save_local_cache
+from app.core.config import settings
+from app.rag.ingest import chunk_documents, generate_embedding, load_local_cache, save_local_cache
 
 MIN_SCORE = 0.35
 
@@ -30,10 +30,43 @@ def _ensure_cache() -> list[dict[str, Any]]:
     cached = load_local_cache()
     if cached:
         return cached
-    chunks = chunk_documents()
-    enriched = [{**c, "embedding": generate_embedding(c["content"])} for c in chunks]
+    from app.rag.ingest import chunk_documents as cd, generate_embedding as ge
+
+    chunks = cd()
+    enriched = [{**c, "embedding": ge(c["content"])} for c in chunks]
     save_local_cache(enriched)
     return enriched
+
+
+def _search_supabase(query_embedding: list[float], limit: int, min_score: float) -> list[dict]:
+    """Búsqueda vectorial en pgvector vía RPC."""
+    if len(query_embedding) != 1536 or not settings.supabase_url:
+        return []
+    try:
+        from app.repositories.supabase_client import get_supabase_client
+
+        response = get_supabase_client().rpc(
+            "match_rag_chunks",
+            {
+                "query_embedding": query_embedding,
+                "match_threshold": min_score,
+                "match_count": limit,
+            },
+        ).execute()
+        results = []
+        for row in response.data or []:
+            results.append(
+                {
+                    "content": row["content"],
+                    "source": row.get("source_path") or "supabase",
+                    "title": row.get("title") or "",
+                    "score": round(float(row.get("similarity", 0)), 3),
+                    "method": "pgvector",
+                }
+            )
+        return results
+    except Exception:
+        return []
 
 
 def _keyword_search(query: str, limit: int) -> list[dict[str, Any]]:
@@ -53,13 +86,8 @@ def _keyword_search(query: str, limit: int) -> list[dict[str, Any]]:
     return [item[1] for item in scored[:limit]]
 
 
-def retrieve_policy_chunks(query: str, limit: int = 3, min_score: float = MIN_SCORE) -> list[dict]:
-    """Búsqueda semántica local con fallback por palabras clave."""
-    if not _meaningful_query(query):
-        return []
-    query_embedding = generate_embedding(query)
+def _search_local(query_embedding: list[float], limit: int, min_score: float) -> list[dict]:
     cache = _ensure_cache()
-
     scored: list[tuple[float, dict]] = []
     for chunk in cache:
         embedding = chunk.get("embedding", [])
@@ -77,9 +105,23 @@ def retrieve_policy_chunks(query: str, limit: int = 3, min_score: float = MIN_SC
                     },
                 )
             )
-
     scored.sort(key=lambda x: x[0], reverse=True)
-    results = [item[1] for item in scored[:limit]]
+    return [item[1] for item in scored[:limit]]
+
+
+def retrieve_policy_chunks(query: str, limit: int = 3, min_score: float = MIN_SCORE) -> list[dict]:
+    """Búsqueda semántica con pgvector, caché local y keywords."""
+    if not _meaningful_query(query):
+        return []
+
+    query_embedding = generate_embedding(query)
+    results = _search_supabase(query_embedding, limit, min_score)
+
+    if not results and len(query_embedding) != 1536:
+        results = _search_local(query_embedding, limit, min_score)
+    elif not results:
+        pseudo = generate_embedding(query)
+        results = _search_local(pseudo, limit, min_score)
 
     if not results:
         results = _keyword_search(query, limit)
