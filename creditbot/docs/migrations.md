@@ -4,7 +4,9 @@
 
 1. `supabase/schema.sql` — esquema v1 base
 2. `supabase/migrations/001_v2_schema.sql` — tablas y columnas v2
-3. `supabase/seed_credit_profiles.sql` — perfiles ficticios (idempotente)
+3. `supabase/migrations/002_validation_failures.sql` — contador de fallos
+4. `supabase/migrations/003_rag_vector_search.sql` — función `match_rag_chunks`
+5. `supabase/seed_credit_profiles.sql` — perfiles ficticios (idempotente)
 
 ## Rollback
 

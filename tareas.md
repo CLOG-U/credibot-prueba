@@ -641,6 +641,28 @@ El MVP se considera completo cuando:
 
 ---
 
+## EPIC-13 — CrediBot v3.1 (pre-Evolution)
+
+- [x] **V3.1-A1** — Cédula duplicada sin 500 (P0)
+- [x] **V3.1-A2** — Idempotencia atómica en webhook (P0)
+- [x] **V3.1-B1** — Metadata tokens/latencia/modelo del agente (P0)
+- [x] **V3.1-B2** — Omitir GPT en validaciones fallidas (P0)
+- [x] **V3.1-B3** — Test fallback OpenAI (P0)
+- [x] **V3.1-B4** — Tools idempotentes registrar/derivar (P0)
+- [x] **V3.1-C1** — RAG pgvector + migración 003 (P0)
+- [x] **V3.1-C2** — Documentos tasas y glosario (P0)
+- [x] **V3.1-C3** — Script evaluate_rag.py (P0)
+- [x] **V3.1-C4** — NLU gastos + texto original/normalizado (P0)
+- [x] **V3.1-C5** — Tests memoria y concurrencia (P0)
+- [x] **V3.1-C6** — Guardrails adversariales extendidos (P0)
+- [x] **V3.1-E1** — .env.example y docs env v3.1 (P0)
+- [ ] **V3.1-D1** — Evolution API adapter y webhook (P0)
+- [ ] **V3.1-QA** — 15 escenarios manuales + evaluación RAG en staging (P0)
+
+**Criterio v3.1:** bloques A–C cerrados, 80+ tests, listo para Evolution.
+
+---
+
 ## Registro de commits v2
 
 | Commit | Tarea(s) | Descripción | Fecha |
