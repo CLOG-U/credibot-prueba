@@ -14,6 +14,10 @@ def test_preprocess_income_natural():
     assert nlu_parser.preprocess("ASK_INCOME", "Gano unos 1200 dólares") == "1200"
 
 
+def test_preprocess_expenses_natural():
+    assert nlu_parser.preprocess("ASK_EXPENSES", "Gasto aproximadamente 400 al mes") == "400"
+
+
 def test_preprocess_term_un_ano():
     assert nlu_parser.preprocess("ASK_TERM", "Un año") == "12"
 

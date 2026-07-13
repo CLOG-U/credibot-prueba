@@ -56,6 +56,10 @@ def preprocess(state: str, text: str) -> str:
             return number
 
     if state == "ASK_EXPENSES":
+        if any(w in lowered for w in ("gasto", "gastos", "pago", "aprox", "mensual")):
+            number = _extract_first_number(stripped)
+            if number:
+                return number
         number = _extract_first_number(stripped)
         if number:
             return number
