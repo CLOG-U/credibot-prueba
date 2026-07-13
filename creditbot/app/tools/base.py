@@ -1,10 +1,20 @@
 """Contratos comunes para tools auditables."""
+import copy
 import time
 import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
+from app.domain.cedula_validator import mask_cedula
 from app.repositories import tool_audit_repository
+
+
+def _mask_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    """Enmascara cédulas en payloads de auditoría."""
+    masked = copy.deepcopy(payload)
+    if "cedula" in masked and masked["cedula"]:
+        masked["cedula"] = mask_cedula(str(masked["cedula"]))
+    return masked
 
 
 @dataclass
@@ -15,6 +25,7 @@ class ToolResponse:
     data: dict[str, Any] = field(default_factory=dict)
     error_code: str | None = None
     trace_id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    latency_ms: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -22,6 +33,7 @@ class ToolResponse:
             "data": self.data,
             "error_code": self.error_code,
             "trace_id": self.trace_id,
+            "latency_ms": self.latency_ms,
         }
 
 
@@ -36,7 +48,7 @@ def audit_tool_call(
     try:
         tool_audit_repository.log_tool_execution(
             tool_name=tool_name,
-            input_payload=input_payload,
+            input_payload=_mask_payload(input_payload),
             output_payload=response.to_dict(),
             conversation_id=conversation_id,
             trace_id=response.trace_id,
@@ -61,5 +73,6 @@ class TimedTool:
         start = time.perf_counter()
         response = handler(**input_payload)
         latency_ms = int((time.perf_counter() - start) * 1000)
+        response.latency_ms = latency_ms
         audit_tool_call(tool_name, input_payload, response, conversation_id, latency_ms)
         return response

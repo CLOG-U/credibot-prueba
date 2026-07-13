@@ -4,6 +4,7 @@ from typing import Any, Callable
 from app.tools.base import TimedTool, ToolResponse
 from app.tools.cedula_tools import consultar_perfil_crediticio, validar_cedula, verificar_identidad
 from app.tools.credit_tools import calcular_monto_maximo, derivar_a_asesor, registrar_solicitud
+from app.tools.message_tools import registrar_mensaje
 from app.tools.policy_tools import obtener_politica_credito
 
 ToolHandler = Callable[..., ToolResponse]
@@ -14,6 +15,7 @@ TOOL_REGISTRY: dict[str, ToolHandler] = {
     "verificar_identidad": verificar_identidad,
     "calcular_monto_maximo": calcular_monto_maximo,
     "registrar_solicitud": registrar_solicitud,
+    "registrar_mensaje": registrar_mensaje,
     "derivar_a_asesor": derivar_a_asesor,
     "obtener_politica_credito": obtener_politica_credito,
 }
@@ -53,9 +55,9 @@ def execute_tool(
     return TimedTool.run(tool_name, handler, arguments, conversation_id)
 
 
-def get_openai_tool_schemas() -> list[dict[str, Any]]:
-    """Esquemas de function calling para OpenAI."""
-    return [
+def get_openai_tool_schemas(state: str | None = None) -> list[dict[str, Any]]:
+    """Esquemas de function calling filtrados por estado."""
+    all_schemas = [
         {
             "type": "function",
             "function": {
@@ -83,6 +85,18 @@ def get_openai_tool_schemas() -> list[dict[str, Any]]:
         {
             "type": "function",
             "function": {
+                "name": "verificar_identidad",
+                "description": "Valida cédula y evalúa elegibilidad del perfil",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"cedula": {"type": "string"}},
+                    "required": ["cedula"],
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
                 "name": "calcular_monto_maximo",
                 "description": "Calcula precalificación con reglas deterministas",
                 "parameters": {
@@ -94,6 +108,23 @@ def get_openai_tool_schemas() -> list[dict[str, Any]]:
                         "term_months": {"type": "integer"},
                     },
                     "required": ["cedula", "monthly_income", "monthly_expenses", "term_months"],
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "registrar_solicitud",
+                "description": "Registra resultado de precalificación",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "request_id": {"type": "string"},
+                        "monthly_payment": {"type": "number"},
+                        "payment_capacity": {"type": "number"},
+                        "result": {"type": "string"},
+                    },
+                    "required": ["request_id", "monthly_payment", "payment_capacity", "result"],
                 },
             },
         },
@@ -125,4 +156,27 @@ def get_openai_tool_schemas() -> list[dict[str, Any]]:
                 },
             },
         },
+        {
+            "type": "function",
+            "function": {
+                "name": "registrar_mensaje",
+                "description": "Registra mensaje en historial",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "conversation_id": {"type": "string"},
+                        "user_id": {"type": "string"},
+                        "direction": {"type": "string"},
+                        "content": {"type": "string"},
+                    },
+                    "required": ["conversation_id", "user_id", "direction", "content"],
+                },
+            },
+        },
     ]
+
+    if not state:
+        return all_schemas
+
+    allowed = get_allowed_tools(state)
+    return [s for s in all_schemas if s["function"]["name"] in allowed]

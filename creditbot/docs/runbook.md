@@ -20,7 +20,11 @@
 ```bash
 curl https://HOST/health
 curl -X POST https://HOST/simulate/message -H "Content-Type: application/json" -d '{"phone":"593999999999","message":"Hola"}'
+pytest app/tests -q
+python scripts/test_v3_flow.py
 ```
+
+Ver guía completa: `docs/pruebas_v3.md`
 
 ## Incidentes comunes
 

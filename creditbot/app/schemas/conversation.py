@@ -10,7 +10,10 @@ class SimulateMessageRequest(BaseModel):
 
 
 class SimulateMessageResponse(BaseModel):
-    """Respuesta del simulador con el mensaje de réplica del bot."""
+    """Respuesta del simulador con metadata v3."""
 
     phone: str
     reply: str
+    state: str | None = None
+    agent_mode: str | None = None
+    tokens: int | None = None

@@ -24,6 +24,9 @@ ENV/
 .coverage
 htmlcov/
 
+# RAG
+.chunk_cache.json
+
 # OS
 .DS_Store
 Thumbs.db

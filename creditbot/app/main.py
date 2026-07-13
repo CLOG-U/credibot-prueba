@@ -6,7 +6,7 @@ from app.api.routes_health import router as health_router
 from app.api.routes_simulator import router as simulator_router
 from app.api.routes_webhook import router as webhook_router
 
-app = FastAPI(title="CrediBot", version="2.0.0")
+app = FastAPI(title="CrediBot", version="3.0.0")
 
 # Registro de routers
 app.include_router(health_router)

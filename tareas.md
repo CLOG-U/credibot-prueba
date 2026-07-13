@@ -611,8 +611,33 @@ El MVP se considera completo cuando:
 - [x] **QA-10** — README y declaración IA (P0)
 - [x] **QA-11** — Runbook (P0)
 - [x] **QA-04** — E2E del simulador (P0)
+- [x] **QA-05** — Tests NLU, guardrails y adversarial v3 (P0)
+- [x] **QA-06** — E2E simulador con metadata agente (P0)
 
 **Criterio Sprint 4:** CI pasa, Cloud Run despliega, demo ensayada.
+
+---
+
+## EPIC-12 — CrediBot v3 AI-first
+
+- [x] **V3-AI-01** — Integrar AgentOrchestrator al flujo principal (P0)
+- [x] **V3-AI-02** — Context builder seguro por estado (P0)
+- [x] **V3-AI-03** — Guardrails anti-injection y anti-invención (P0)
+- [x] **V3-AI-04** — Fallback deterministic cuando GPT deshabilitado (P0)
+- [x] **V3-NLU-01** — Parser natural ingreso/plazo/consentimiento/empleo (P0)
+- [x] **V3-TOOL-01** — 8 tools con schemas y auditoría (P0)
+- [x] **V3-RAG-01** — Ingesta vectorial local + faqs/privacidad (P0)
+- [x] **V3-RAG-02** — Rechazo sin evidencia en consultas cortas (P0)
+- [x] **V3-SES-01** — Recuperación sesión Supabase (P0)
+- [x] **V3-SIM-01** — Simulador con state/agent_mode/tokens (P0)
+- [x] **V3-DASH-01** — Página Simulador v3 en dashboard (P0)
+- [ ] **V3-RAG-03** — Evaluación 20 preguntas con métricas (P0)
+- [ ] **V3-QA-01** — 15 escenarios manuales del plan (P0)
+- [ ] **V3-QA-02** — Tests concurrencia y duplicados (P1)
+- [ ] **V3-OPENAI-01** — Prueba con API key real (P0)
+- [ ] **V3-WA-01** — WhatsApp E2E con GPT (P1)
+
+**Criterio v3:** simulador completo con NLU + GPT opcional + RAG, 61+ tests, guía de pruebas.
 
 ---
 

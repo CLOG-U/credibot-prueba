@@ -1,7 +1,9 @@
-"""Lógica principal del flujo conversacional v2 (determinista, sin GPT)."""
+"""Lógica principal del flujo conversacional v3 (determinista + GPT opcional)."""
 import re
 from typing import Any
 
+from app.agent.agent_service import get_agent_orchestrator
+from app.agent.context_builder import ConversationContextBuilder, get_draft_for_conversation
 from app.core.constants import (
     ASK_CEDULA,
     ASK_EMPLOYMENT,
@@ -20,6 +22,7 @@ from app.core.constants import (
     SHOW_RESULT,
     START,
 )
+from app.core.config import settings
 from app.domain.cedula_validator import normalize_cedula
 from app.domain.credit_rules import (
     RULES_VERSION,
@@ -34,11 +37,20 @@ from app.repositories import (
     message_repository,
     user_repository,
 )
-from app.services import handoff_service, message_service, validation_service
+from app.services import handoff_service, message_service, nlu_parser, validation_service
+from app.session.session_store import get_or_recover_session, sync_session_from_conversation
+from app.tools.policy_tools import obtener_politica_credito
 
-HANDOFF_KEYWORDS = {"asesor", "humano", "persona", "agente"}
+HANDOFF_KEYWORDS = {"asesor", "humano", "persona", "agente", "asesora", "operador"}
 
 _pending_evaluations: dict[str, dict[str, Any]] = {}
+_context_builder = ConversationContextBuilder()
+_last_agent_meta: dict[str, dict[str, Any]] = {}
+
+
+def get_last_agent_metadata(conversation_id: str) -> dict[str, Any]:
+    """Retorna metadata del último procesamiento del agente."""
+    return _last_agent_meta.get(conversation_id, {})
 
 
 def _contains_handoff_keyword(text: str) -> bool:
@@ -129,6 +141,69 @@ def _calculate_and_store(
     return result_data
 
 
+def _maybe_answer_policy_question(state: str, text: str, canonical: str) -> str:
+    """Enriquece respuesta con RAG si el usuario hace una pregunta informativa."""
+    if state not in {"MENU", "CONSENTIMIENTO", "ASK_INCOME", "ASK_EMPLOYMENT", "ASK_EXPENSES", "ASK_TERM", "ASK_PURPOSE"}:
+        return canonical
+    lowered = text.lower()
+    if "?" not in text and not any(
+        w in lowered for w in ("qué", "que ", "cuál", "cual", "cómo", "como", "plazo", "tasa", "documento", "privacidad")
+    ):
+        return canonical
+
+    rag = obtener_politica_credito(text)
+    if not rag.success:
+        return canonical
+
+    sources = ", ".join(rag.data.get("sources", []))
+    snippet = rag.data["chunks"][0]["content"][:400] if rag.data.get("chunks") else ""
+    return f"{canonical}\n\nInformación de política ({sources}):\n{snippet}"
+
+
+def _apply_agent_layer(
+    *,
+    user_message: str,
+    state: str,
+    conversation_id: str,
+    user_id: str,
+    canonical_response: str,
+    skip_agent: bool,
+) -> tuple[str, dict[str, Any]]:
+    """Ejecuta GPT sobre respuesta canónica sin alterar el estado."""
+    if skip_agent or not canonical_response or not settings.enable_gpt_agent:
+        meta = {"mode": "deterministic", "tokens": 0}
+        _last_agent_meta[conversation_id] = meta
+        return canonical_response, meta
+
+    draft = get_draft_for_conversation(conversation_id)
+    context = _context_builder.build(
+        conversation_id=conversation_id,
+        state=state,
+        user_id=user_id,
+        draft_request=draft,
+        canonical_response=canonical_response,
+    )
+
+    agent_result = get_agent_orchestrator().process(
+        user_message=user_message,
+        state=state,
+        conversation_id=conversation_id,
+        context=context,
+        canonical_response=canonical_response,
+        user_id=user_id,
+    )
+
+    meta = {
+        "mode": agent_result.get("mode"),
+        "tokens": agent_result.get("tokens", 0),
+        "reason": agent_result.get("reason"),
+        "tools": [t.get("tool") for t in agent_result.get("tool_results", [])],
+    }
+    _last_agent_meta[conversation_id] = meta
+    content = agent_result.get("content") or canonical_response
+    return content, meta
+
+
 def process_message(phone: str, text: str, raw_payload: dict[str, Any] | None = None) -> str:
     """Procesa un mensaje entrante y retorna la respuesta del bot."""
     user = user_repository.get_or_create_user(phone)
@@ -137,11 +212,14 @@ def process_message(phone: str, text: str, raw_payload: dict[str, Any] | None = 
     conversation = conversation_repository.get_or_create_active_conversation(user_id)
     conversation_id = conversation["id"]
     state = conversation["current_state"]
+    get_or_recover_session(conversation_id)
 
     message_repository.save_inbound_message(
         conversation_id, user_id, text, raw_payload=raw_payload
     )
 
+    original_text = text
+    text = nlu_parser.preprocess(state, text)
     normalized_text = text.strip().lower()
     if state not in {HANDOFF_REQUESTED, FINISHED} and _contains_handoff_keyword(normalized_text):
         return _request_handoff(
@@ -307,7 +385,8 @@ def process_message(phone: str, text: str, raw_payload: dict[str, Any] | None = 
             conversation_repository.reset_validation_failures(conversation_id)
             request = credit_repository.get_draft_request(conversation_id)
             if request:
-                credit_repository.update_employment(request["id"], text.strip())
+                employment = nlu_parser.parse_employment_type(text)
+                credit_repository.update_employment(request["id"], employment)
             response = message_service.ask_expenses_message()
             next_state = ASK_EXPENSES
 
@@ -436,9 +515,32 @@ def process_message(phone: str, text: str, raw_payload: dict[str, Any] | None = 
         response = message_service.welcome_message()
         next_state = MENU
 
+    skip_agent = next_state in {HANDOFF_REQUESTED, FINISHED} or state in {HANDOFF_REQUESTED, FINISHED}
+    response = _maybe_answer_policy_question(state, text, response)
+    response, agent_meta = _apply_agent_layer(
+        user_message=original_text,
+        state=state,
+        conversation_id=conversation_id,
+        user_id=user_id,
+        canonical_response=response,
+        skip_agent=skip_agent,
+    )
+
     if next_state != state:
         conversation_repository.update_state(conversation_id, next_state)
 
     conversation_repository.update_last_message(conversation_id, response)
-    message_repository.save_outbound_message(conversation_id, user_id, response)
+    sync_session_from_conversation(
+        {
+            "id": conversation_id,
+            "current_state": next_state,
+            "validation_failures": conversation.get("validation_failures", 0),
+            "user_id": user_id,
+        }
+    )
+
+    outbound_payload = {"agent": agent_meta, "state": next_state}
+    message_repository.save_outbound_message(
+        conversation_id, user_id, response, raw_payload=outbound_payload
+    )
     return response

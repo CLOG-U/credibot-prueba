@@ -2,16 +2,12 @@
 from app.agent.orchestrator import AgentOrchestrator
 
 
-def test_orchestrator_fallback_when_gpt_disabled():
+def test_orchestrator_deterministic_when_gpt_disabled():
     orchestrator = AgentOrchestrator()
-
-    def fallback(msg):
-        return f"fallback:{msg}"
-
     result = orchestrator.process(
         user_message="hola",
         state="MENU",
-        fallback_handler=fallback,
+        canonical_response="Respuesta canónica",
     )
     assert result["mode"] == "deterministic"
-    assert "fallback:hola" in result["content"]
+    assert result["content"] == "Respuesta canónica"

@@ -73,14 +73,55 @@ def get_session_store() -> SessionStore:
     return _session_store
 
 
+def load_session_from_supabase(conversation_id: str) -> dict[str, Any] | None:
+    """Recupera sesión desde Supabase cuando no hay caché."""
+    try:
+        from app.repositories import message_repository
+        from app.repositories.supabase_client import get_supabase_client
+
+        conv = (
+            get_supabase_client()
+            .table("conversations")
+            .select("*")
+            .eq("id", conversation_id)
+            .limit(1)
+            .execute()
+        )
+        if not conv.data:
+            return None
+
+        conversation = conv.data[0]
+        messages = message_repository.get_messages_by_conversation(conversation_id)
+        session_data = {
+            "state": conversation.get("current_state"),
+            "validation_failures": conversation.get("validation_failures", 0),
+            "user_id": conversation.get("user_id"),
+            "message_count": len(messages),
+            "recovered_from": "supabase",
+        }
+        get_session_store().set(conversation_id, session_data)
+        return session_data
+    except Exception:
+        return None
+
+
 def sync_session_from_conversation(conversation: dict[str, Any]) -> None:
     """Sincroniza estado de conversación Supabase hacia sesión."""
-    store = get_session_store()
-    store.set(
+    get_session_store().set(
         conversation["id"],
         {
             "state": conversation.get("current_state"),
             "validation_failures": conversation.get("validation_failures", 0),
             "user_id": conversation.get("user_id"),
+            "recovered_from": "live",
         },
     )
+
+
+def get_or_recover_session(conversation_id: str) -> dict[str, Any] | None:
+    """Obtiene sesión de caché o recupera desde Supabase."""
+    store = get_session_store()
+    data = store.get(conversation_id)
+    if data:
+        return data
+    return load_session_from_supabase(conversation_id)
