@@ -25,6 +25,20 @@ services:
         value: "true"
       - key: DEFAULT_COUNTRY_CODE
         value: "593"
+      - key: ENABLE_GPT_AGENT
+        value: "true"
+      - key: LLM_PROVIDER
+        value: "openai"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: "gpt-4o-mini"
+      - key: OPENAI_MAX_TOKENS
+        value: "500"
+      - key: OPENAI_TIMEOUT_SECONDS
+        value: "30"
+      - key: OPENAI_MAX_ITERATIONS
+        value: "3"
 
   - type: web
     name: creditbot-dashboard
@@ -39,4 +53,6 @@ services:
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
       - key: ADMIN_DASHBOARD_PASSWORD
+        sync: false
+      - key: CREDIBOT_API_URL
         sync: false
