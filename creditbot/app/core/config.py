@@ -30,5 +30,27 @@ class Settings(BaseSettings):
     # --- Configuración regional ---
     default_country_code: str = "593"
 
+    # --- OpenAI / Agente GPT ---
+    openai_api_key: str = ""
+    openai_model: str = "gpt-4o-mini"
+    openai_max_tokens: int = 500
+    openai_timeout_seconds: int = 30
+    openai_max_iterations: int = 3
+    llm_provider: str = "mock"
+    enable_gpt_agent: bool = False
+
+    # --- Meta WhatsApp ---
+    meta_verify_token: str = ""
+    meta_access_token: str = ""
+    meta_phone_number_id: str = ""
+    meta_app_secret: str = ""
+    whatsapp_provider: str = "twilio"
+
+    # --- Redis ---
+    redis_url: str = ""
+
+    # --- Admin ---
+    admin_dashboard_password: str = ""
+
 
 settings = Settings()

@@ -484,10 +484,10 @@ El MVP se considera completo cuando:
 |---|---|---|---|
 | Preparación + EPIC-00 | 8 | 3 | 5 |
 | Sprint 1 — Datos y dominio | 35 | 35 | 0 |
-| Sprint 2 — Tools, GPT, RAG | 28 | 0 | 28 |
+| Sprint 2 — Tools, GPT, RAG | 28 | 28 | 0 |
 | Sprint 3 — WhatsApp, Redis, Admin | 29 | 0 | 29 |
 | Sprint 4 — DevOps y QA | 30 | 0 | 30 |
-| **Total v2** | **~130** | **38** | **~92** |
+| **Total v2** | **~130** | **66** | **~64** |
 
 ---
 
@@ -609,6 +609,7 @@ El MVP se considera completo cuando:
 
 | Commit | Tarea(s) | Descripción | Fecha |
 |---|---|---|---|
+| 4 | TOOL,AI,RAG | Tools, orquestador GPT y RAG base | 2026-07-12 |
 | 3 | FLOW-01..09 | Flujo conversacional v2 sin GPT | 2026-07-12 |
 | 2 | DOM-01..09 | Dominio crediticio y validador de cédula | 2026-07-12 |
 | 1 | GOV-01,05 DATA-01..11 | Migraciones v2, seed y ADR arquitectura | 2026-07-12 |

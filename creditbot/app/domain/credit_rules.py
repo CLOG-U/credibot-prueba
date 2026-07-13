@@ -154,6 +154,29 @@ def calculate_max_amount(monthly_income: float, category: str) -> float:
     return round(monthly_income * multiplier, 2)
 
 
+def _affordable_amount(
+    max_amount: float,
+    term_months: int,
+    annual_rate: float,
+    capacity: float,
+) -> float:
+    """Reduce monto hasta que la cuota quepa en la capacidad."""
+    if max_amount <= 0 or capacity <= 0:
+        return 0.0
+
+    low, high = 0.0, max_amount
+    affordable = 0.0
+    while high - low > 1.0:
+        mid = round((low + high) / 2, 2)
+        payment = calculate_french_payment(mid, term_months, annual_rate)
+        if payment <= capacity:
+            affordable = mid
+            low = mid
+        else:
+            high = mid
+    return affordable
+
+
 def evaluate_precalification(
     profile: CreditProfileInput,
     monthly_income: float,
@@ -184,7 +207,10 @@ def evaluate_precalification(
         monthly_expenses,
     )
     max_amount = calculate_max_amount(monthly_income, category)
-    suggested = min(requested_amount, max_amount) if requested_amount else max_amount
+    if requested_amount is not None:
+        suggested = min(requested_amount, max_amount)
+    else:
+        suggested = _affordable_amount(max_amount, term_months, annual_rate, capacity)
     suggested = round(max(suggested, 0.0), 2)
 
     monthly_payment = calculate_french_payment(suggested, term_months, annual_rate)

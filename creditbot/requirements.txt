@@ -11,3 +11,6 @@ streamlit
 pandas
 pytest
 pytest-asyncio
+openai>=1.40.0
+redis>=5.0.0
+ruff
