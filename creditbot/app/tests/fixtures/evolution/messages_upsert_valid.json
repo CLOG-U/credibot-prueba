@@ -1,0 +1,20 @@
+{
+  "event": "messages.upsert",
+  "instance": "credibot-pruebas",
+  "data": {
+    "key": {
+      "remoteJid": "593999888777@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0TEST001"
+    },
+    "pushName": "Usuario Prueba",
+    "message": {
+      "conversation": "Quiero solicitar un crédito"
+    },
+    "messageTimestamp": 1709550600
+  },
+  "destination": "https://example.com/webhook/evolution",
+  "date_time": "2024-03-04T10:30:00.000Z",
+  "server_url": "http://localhost:8080",
+  "apikey": "REDACTED"
+}

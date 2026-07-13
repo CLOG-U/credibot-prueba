@@ -46,6 +46,14 @@ class Settings(BaseSettings):
     meta_app_secret: str = ""
     whatsapp_provider: str = "twilio"
 
+    # --- Evolution API (WhatsApp académico) ---
+    evolution_api_url: str = ""
+    evolution_api_key: str = ""
+    evolution_instance: str = "credibot-pruebas"
+    evolution_webhook_secret: str = ""
+    evolution_timeout_seconds: int = 15
+    evolution_max_retries: int = 2
+
     # --- Redis ---
     redis_url: str = ""
 

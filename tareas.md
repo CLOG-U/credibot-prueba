@@ -656,10 +656,10 @@ El MVP se considera completo cuando:
 - [x] **V3.1-C5** — Tests memoria y concurrencia (P0)
 - [x] **V3.1-C6** — Guardrails adversariales extendidos (P0)
 - [x] **V3.1-E1** — .env.example y docs env v3.1 (P0)
-- [ ] **V3.1-D1** — Evolution API adapter y webhook (P0)
+- [x] **V3.1-D1** — Evolution API adapter y webhook (P0) — código + 17 tests; E2E WhatsApp manual pendiente
 - [ ] **V3.1-QA** — 15 escenarios manuales + evaluación RAG en staging (P0)
 
-**Criterio v3.1:** bloques A–C cerrados, 80+ tests, listo para Evolution.
+**Criterio v3.1:** bloques A–D cerrados en código, 97 tests, pendiente staging (RAG 003 + E2E Evolution + QA manual).
 
 ---
 

@@ -1,0 +1,16 @@
+{
+  "event": "messages.upsert",
+  "instance": "credibot-pruebas",
+  "data": {
+    "key": {
+      "remoteJid": "593999888777@s.whatsapp.net",
+      "fromMe": false,
+      "id": "3EB0IMAGE01"
+    },
+    "message": {
+      "imageMessage": {
+        "caption": ""
+      }
+    }
+  }
+}

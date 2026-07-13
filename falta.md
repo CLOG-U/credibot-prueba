@@ -1,8 +1,8 @@
 # CrediBot v3.1 — Resumen de avance y pendientes
 
-**Fecha:** 12 de julio de 2026  
+**Fecha:** 13 de julio de 2026  
 **Fuente:** [plan.md](plan.md), [tareas.md](tareas.md)  
-**Enfoque:** v3.1 AI + Evolution API (bloque D pendiente)
+**Enfoque:** v3.1 — bloque D (Evolution) cerrado en código; pendiente E2E manual y staging
 
 ---
 
@@ -10,56 +10,89 @@
 
 | Métrica | Valor |
 |---|---|
-| Tests automatizados | **80 passing** |
+| Tests automatizados | **97 passing** |
 | Backend producción | https://credibot-prueba.onrender.com |
-| Supabase | Configurado con 25 perfiles |
+| Supabase | Migraciones 001–002 + seed (003 RAG pendiente en productivo) |
 | OpenAI | Activo en Render |
-| Bloque D (Evolution) | **Pendiente** |
+| Bloque D (Evolution) | **Código ✅** · E2E WhatsApp manual ⏳ |
+| Rama | `main` |
 
 ---
 
-## Completado (bloques A, B, C, E parcial)
+## Completado
 
-### A — Correcciones
-- Cédula duplicada sin error 500
-- Idempotencia reclamada antes de `process_message`
+### Bloques A, B, C
+- IA, tools, RAG (código), NLU, memoria, guardrails, idempotencia
+- Ver plan.md §5–11
 
-### B — IA y tools
-- Tokens, latencia y modelo en metadata del agente
-- GPT omitido en validaciones fallidas
-- Tools `registrar_solicitud` y `derivar_a_asesor` idempotentes
-- Tests de fallback OpenAI y tools
+### Bloque D — Evolution API (sesión 12–13 jul 2026)
 
-### C — RAG, NLU, memoria, guardrails
-- RAG pgvector (`003_rag_vector_search.sql`) + retriever híbrido
-- Documentos `tasas_plazos.md`, `glosario.md`
-- Script `scripts/evaluate_rag.py`
-- NLU gastos naturales + texto original/normalizado en mensajes
-- Tests adversariales extendidos, memoria y concurrencia
-
-### E — Configuración
-- `.env.example` v3.1 con Evolution
-- `docs/env_v3.1.md`, `migrations.md` actualizado
-- `plan.md` línea base corregida
-
----
-
-## Pendiente antes de Evolution (bloque D)
-
-| Item | Prioridad |
+| Entrega | Archivo / ruta |
 |---|---|
-| Aplicar migración `003_rag_vector_search.sql` en Supabase | P0 |
-| Ejecutar `python scripts/evaluate_rag.py` y documentar hit rate | P0 |
-| Dashboard Render (`creditbot-dashboard`) | P1 |
-| 15 escenarios manuales del plan §13 | P0 |
+| Provider | `creditbot/app/providers/whatsapp/evolution.py` |
+| Normalización webhook | `creditbot/app/schemas/evolution.py` |
+| Webhook | `POST /webhook/evolution` |
+| Health instancia | `GET /health/evolution` |
+| Docker local | `creditbot/docker-compose.evolution.yml` |
+| Guía QR / revocación | `creditbot/docs/evolution_setup.md` |
+| Fixtures + tests | `creditbot/app/tests/fixtures/evolution/`, `test_whatsapp_evolution.py` (+17 tests) |
+
+EVO-01 a EVO-14 y EVO-16: ✅ en código. EVO-15 (E2E real WhatsApp): ⏳ manual.
 
 ---
 
-## Bloque D — Evolution API (siguiente fase)
+## Pendiente — próxima sesión (orden sugerido)
 
-- `EvolutionWhatsAppProvider`
-- Webhook `POST /webhooks/evolution`
-- Docker Compose local
-- E2E WhatsApp con IA
+### P0 — Staging / cierre académico
 
-Ver plan.md §12 (EVO-01 a EVO-16).
+1. **Commit del bloque D** (cambios locales sin pushear).
+2. **Migración RAG:** aplicar `creditbot/supabase/migrations/003_rag_vector_search.sql` en Supabase productivo.
+3. **Ingesta RAG remota:**
+   ```bash
+   cd creditbot
+   python -c "from app.rag.ingest import ingest_all; ingest_all(persist_remote=True)"
+   python scripts/evaluate_rag.py
+   ```
+   Documentar hit rate en `docs/rag/evaluacion.md`.
+4. **Evolution E2E manual** — seguir `creditbot/docs/evolution_setup.md`:
+   - Docker + instancia `credibot-pruebas` + QR
+   - Webhook con túnel HTTPS
+   - Recorrido completo IA + RAG + handoff
+5. **15 escenarios manuales** — plan.md §13 (cédulas en plan §21).
+
+### P1 — Opcional
+
+- Dashboard Streamlit en Render (`creditbot-dashboard`)
+- NLU baja confianza / ortografía
+- TOOL-08 cobertura completa por tool
+- Documentación académica y ensayo de demo
+
+---
+
+## Archivos del bloque D (en repo)
+
+Ver `creditbot/docs/evolution_setup.md` y `falta.md` §Completado.
+
+**Local (no commitear):** `creditbot/.env`, `creditbot/.env.evolution`
+
+---
+
+## Comandos rápidos para retomar
+
+```bash
+cd creditbot
+python -m pytest app/tests -q          # debe dar 97 passed
+uvicorn app.main:app --reload --port 8001
+
+# Evolution (cuando toque E2E)
+cp .env.evolution.example .env.evolution
+docker compose -f docker-compose.evolution.yml up -d
+```
+
+---
+
+## Referencias
+
+- Plan maestro: [plan.md](plan.md)
+- Tareas EPIC-13: [tareas.md](tareas.md)
+- Evolution setup: [creditbot/docs/evolution_setup.md](creditbot/docs/evolution_setup.md)

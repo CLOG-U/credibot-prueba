@@ -1,12 +1,14 @@
-"""Rutas del webhook de WhatsApp (Twilio y Meta)."""
+"""Rutas del webhook de WhatsApp (Twilio, Meta y Evolution)."""
 import logging
 
 from fastapi import APIRouter, HTTPException, Query, Request, Response
 
 from app.core.config import settings
+from app.providers.whatsapp.evolution import EvolutionWhatsAppProvider
 from app.providers.whatsapp.factory import get_whatsapp_provider
 from app.providers.whatsapp.meta_cloud import MetaWhatsAppProvider
 from app.repositories import inbound_events_repository
+from app.schemas.evolution import mask_phone
 from app.schemas.whatsapp import extract_twilio_message
 from app.services.conversation_service import process_message
 from app.services.whatsapp_service import WhatsAppServiceError
@@ -100,7 +102,14 @@ async def _process_inbound(incoming: dict) -> None:
     try:
         provider.send_text(phone, reply)
     except (WhatsAppServiceError, ValueError) as exc:
-        logger.error("No se pudo enviar mensaje a %s: %s", phone, exc)
+        logger.error("No se pudo enviar mensaje a %s: %s", mask_phone(phone), exc)
+    except Exception as exc:
+        logger.error(
+            "No se pudo enviar mensaje a %s (%s): %s",
+            mask_phone(phone),
+            provider.name,
+            exc,
+        )
 
 
 @router.post("/whatsapp")
@@ -136,3 +145,36 @@ async def receive_whatsapp_webhook(request: Request):
         await _process_inbound(incoming)
 
     return Response(content="", media_type="text/plain")
+
+
+@router.post("/evolution")
+async def receive_evolution_webhook(
+    request: Request,
+    secret: str | None = Query(None),
+):
+    """Recibe eventos de Evolution API (MESSAGES_UPSERT, etc.)."""
+    header_secret = request.headers.get("X-Credibot-Webhook-Secret")
+    if not EvolutionWhatsAppProvider.validate_webhook_secret(secret, header_secret):
+        raise HTTPException(status_code=403, detail="Secreto de webhook inválido")
+
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="JSON inválido") from exc
+
+    event = (payload.get("event") or "unknown").lower()
+    provider = EvolutionWhatsAppProvider()
+    incoming = provider.parse_inbound(payload)
+
+    if incoming:
+        logger.info(
+            "Evolution inbound: event=%s instance=%s from=%s",
+            event,
+            incoming.get("instance"),
+            mask_phone(incoming["phone"]),
+        )
+        await _process_inbound(incoming)
+    else:
+        logger.debug("Evolution event ignored: %s", event)
+
+    return {"status": "ok", "event": event}

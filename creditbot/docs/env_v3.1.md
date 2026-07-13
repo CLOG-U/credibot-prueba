@@ -28,6 +28,10 @@ Copia `.env.example` a `.env` y completa los valores.
 | `EVOLUTION_API_KEY` | API key local |
 | `EVOLUTION_INSTANCE` | `credibot-pruebas` |
 | `EVOLUTION_WEBHOOK_SECRET` | Secreto del webhook |
+| `EVOLUTION_TIMEOUT_SECONDS` | Timeout HTTP (default 15) |
+| `EVOLUTION_MAX_RETRIES` | Reintentos en 5xx/timeout (default 2) |
+
+Guía completa: `docs/evolution_setup.md`
 
 ## Dashboard Streamlit
 

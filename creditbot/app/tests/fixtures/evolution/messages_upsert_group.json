@@ -1,0 +1,14 @@
+{
+  "event": "messages.upsert",
+  "instance": "credibot-pruebas",
+  "data": {
+    "key": {
+      "remoteJid": "120363000000000000@g.us",
+      "fromMe": false,
+      "id": "3EB0GROUP01"
+    },
+    "message": {
+      "conversation": "Mensaje de grupo"
+    }
+  }
+}
