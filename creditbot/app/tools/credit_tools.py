@@ -57,6 +57,12 @@ def registrar_solicitud(
     **extra_fields,
 ) -> ToolResponse:
     """Registra resultado de solicitud."""
+    existing = credit_repository.get_request_by_id(request_id)
+    if existing and existing.get("status") == "completed":
+        return ToolResponse(
+            success=True,
+            data={"request_id": existing["id"], "status": existing["status"], "idempotent": True},
+        )
     try:
         saved = credit_repository.save_result(
             request_id,
@@ -78,6 +84,12 @@ def derivar_a_asesor(
     **_,
 ) -> ToolResponse:
     """Crea caso de derivación a asesor."""
+    pending = handoff_repository.get_pending_case_for_conversation(conversation_id)
+    if pending:
+        return ToolResponse(
+            success=True,
+            data={"handoff_id": pending["id"], "status": pending["status"], "idempotent": True},
+        )
     try:
         case = handoff_repository.create_handoff_case(
             user_id=user_id,

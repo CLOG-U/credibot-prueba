@@ -5,6 +5,23 @@ from typing import Any
 from app.repositories.supabase_client import get_supabase_client
 
 
+def get_pending_case_for_conversation(conversation_id: str) -> dict[str, Any] | None:
+    """Retorna caso handoff pendiente de una conversación."""
+    response = (
+        get_supabase_client()
+        .table("handoff_cases")
+        .select("*")
+        .eq("conversation_id", conversation_id)
+        .eq("status", "pending")
+        .order("created_at", desc=True)
+        .limit(1)
+        .execute()
+    )
+    if response.data:
+        return response.data[0]
+    return None
+
+
 def create_handoff_case(
     user_id: str,
     conversation_id: str,

@@ -39,6 +39,21 @@ def get_draft_request(conversation_id: str) -> dict[str, Any] | None:
     return None
 
 
+def get_request_by_id(request_id: str) -> dict[str, Any] | None:
+    """Retorna una solicitud por id."""
+    response = (
+        get_supabase_client()
+        .table("credit_requests")
+        .select("*")
+        .eq("id", request_id)
+        .limit(1)
+        .execute()
+    )
+    if response.data:
+        return response.data[0]
+    return None
+
+
 def update_amount(request_id: str, amount: float) -> dict[str, Any]:
     """Actualiza el monto solicitado en una solicitud."""
     response = (
