@@ -196,6 +196,8 @@ def _apply_agent_layer(
     meta = {
         "mode": agent_result.get("mode"),
         "tokens": agent_result.get("tokens", 0),
+        "latency_ms": agent_result.get("latency_ms", 0),
+        "model": agent_result.get("model"),
         "reason": agent_result.get("reason"),
         "tools": [t.get("tool") for t in agent_result.get("tool_results", [])],
     }
@@ -214,12 +216,18 @@ def process_message(phone: str, text: str, raw_payload: dict[str, Any] | None = 
     state = conversation["current_state"]
     get_or_recover_session(conversation_id)
 
-    message_repository.save_inbound_message(
-        conversation_id, user_id, text, raw_payload=raw_payload
-    )
-
     original_text = text
     text = nlu_parser.preprocess(state, text)
+    message_repository.save_inbound_message(
+        conversation_id,
+        user_id,
+        text,
+        raw_payload={
+            **(raw_payload or {}),
+            "original_text": original_text,
+            "normalized_text": text,
+        },
+    )
     normalized_text = text.strip().lower()
     if state not in {HANDOFF_REQUESTED, FINISHED} and _contains_handoff_keyword(normalized_text):
         return _request_handoff(
@@ -516,6 +524,8 @@ def process_message(phone: str, text: str, raw_payload: dict[str, Any] | None = 
         next_state = MENU
 
     skip_agent = next_state in {HANDOFF_REQUESTED, FINISHED} or state in {HANDOFF_REQUESTED, FINISHED}
+    validation_failed = next_state == state and state not in {START, SHOW_RESULT}
+    skip_agent = skip_agent or validation_failed
     response = _maybe_answer_policy_question(state, text, response)
     response, agent_meta = _apply_agent_layer(
         user_message=original_text,

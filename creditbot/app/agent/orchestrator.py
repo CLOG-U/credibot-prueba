@@ -1,5 +1,6 @@
 """Orquestador GPT con tools, guardrails y fallback determinista."""
 import json
+import time
 from typing import Any
 
 from app.agent.context_builder import ConversationContextBuilder
@@ -55,6 +56,8 @@ class AgentOrchestrator:
                 "tool_results": [],
                 "reason": "prompt_injection",
                 "tokens": 0,
+                "latency_ms": 0,
+                "model": settings.openai_model,
             }
 
         if not settings.enable_gpt_agent:
@@ -63,6 +66,8 @@ class AgentOrchestrator:
                 "content": canonical_response,
                 "tool_results": [],
                 "tokens": 0,
+                "latency_ms": 0,
+                "model": settings.openai_model,
             }
 
         if not context:
@@ -77,6 +82,7 @@ class AgentOrchestrator:
         tools = get_openai_tool_schemas(state)
         tool_results: list[dict[str, Any]] = []
         total_tokens = 0
+        started = time.perf_counter()
 
         try:
             for _ in range(self._max_iterations):
@@ -130,6 +136,8 @@ class AgentOrchestrator:
                         "tool_results": tool_results,
                         "reason": validation_error,
                         "tokens": total_tokens,
+                        "latency_ms": int((time.perf_counter() - started) * 1000),
+                        "model": settings.openai_model,
                     }
 
                 final_content = content or canonical_response
@@ -138,6 +146,8 @@ class AgentOrchestrator:
                     "content": final_content,
                     "tool_results": tool_results,
                     "tokens": total_tokens,
+                    "latency_ms": int((time.perf_counter() - started) * 1000),
+                    "model": settings.openai_model,
                 }
 
         except Exception as exc:
@@ -147,6 +157,8 @@ class AgentOrchestrator:
                 "tool_results": tool_results,
                 "reason": str(exc),
                 "tokens": total_tokens,
+                "latency_ms": int((time.perf_counter() - started) * 1000),
+                "model": settings.openai_model,
             }
 
         return {
@@ -155,4 +167,6 @@ class AgentOrchestrator:
             "tool_results": tool_results,
             "reason": "max_iterations",
             "tokens": total_tokens,
+            "latency_ms": int((time.perf_counter() - started) * 1000),
+            "model": settings.openai_model,
         }

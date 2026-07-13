@@ -17,3 +17,5 @@ class SimulateMessageResponse(BaseModel):
     state: str | None = None
     agent_mode: str | None = None
     tokens: int | None = None
+    latency_ms: int | None = None
+    model: str | None = None

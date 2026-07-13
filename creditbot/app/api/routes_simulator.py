@@ -15,6 +15,8 @@ def simulate_message(payload: SimulateMessageRequest):
     state = None
     agent_mode = None
     tokens = None
+    latency_ms = None
+    model = None
     try:
         user = user_repository.get_user_by_phone(payload.phone)
         if user:
@@ -24,6 +26,8 @@ def simulate_message(payload: SimulateMessageRequest):
                 meta = get_last_agent_metadata(conversation["id"])
                 agent_mode = meta.get("mode")
                 tokens = meta.get("tokens")
+                latency_ms = meta.get("latency_ms")
+                model = meta.get("model")
     except Exception:
         pass
     return SimulateMessageResponse(
@@ -32,4 +36,6 @@ def simulate_message(payload: SimulateMessageRequest):
         state=state,
         agent_mode=agent_mode,
         tokens=tokens,
+        latency_ms=latency_ms,
+        model=model,
     )
