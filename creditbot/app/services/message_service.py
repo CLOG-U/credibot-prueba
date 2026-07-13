@@ -4,23 +4,105 @@
 def welcome_message() -> str:
     """Mensaje de bienvenida con el menú principal."""
     return (
-        "Hola, soy CrediBot. ¿Qué deseas hacer?\n"
+        "Hola, soy CrediBot. Te ayudo con la *precalificación* de crédito.\n"
+        "Esto no es una aprobación final ni un desembolso.\n\n"
+        "¿Qué deseas hacer?\n"
         "1. Precalificar crédito\n"
         "2. Información general\n"
         "3. Hablar con asesor"
     )
 
 
-def ask_name_message() -> str:
-    """Solicita el nombre completo al usuario."""
-    return "Perfecto. Indícame tu nombre completo."
+def consent_message() -> str:
+    """Aviso de precalificación y solicitud de consentimiento."""
+    return (
+        "Antes de continuar, debes saber que:\n"
+        "- Esto es solo una *precalificación* con datos *ficticios* para fines académicos.\n"
+        "- Usaremos tu cédula para consultar un perfil crediticio simulado.\n"
+        "- Puedes pedir un asesor en cualquier momento.\n\n"
+        "¿Aceptas continuar?\n"
+        "1. Sí, acepto\n"
+        "2. No, volver al menú"
+    )
 
 
-def ask_amount_message(name: str | None = None) -> str:
-    """Solicita el monto del crédito, opcionalmente saludando por el nombre."""
-    if name:
-        return f"Gracias, {name}. ¿Qué monto deseas solicitar?"
-    return "¿Qué monto deseas solicitar?"
+def ask_cedula_message() -> str:
+    """Solicita la cédula ecuatoriana."""
+    return "Ingresa tu número de cédula ecuatoriana (10 dígitos)."
+
+
+def profile_verified_message(profile: dict) -> str:
+    """Confirma identidad y muestra score del perfil ficticio."""
+    return (
+        f"Identidad verificada: {profile['full_name']}.\n"
+        f"Score crediticio: {profile['credit_score']} ({profile['score_category']}).\n"
+        "Continuemos con tu información financiera."
+    )
+
+
+def not_eligible_message(reasons: list[str]) -> str:
+    """Mensaje cuando el perfil no es elegible."""
+    reason_text = ", ".join(reasons) if reasons else "perfil de alto riesgo"
+    return (
+        f"Por el momento no cumples condiciones de precalificación ({reason_text}).\n"
+        "Un asesor puede orientarte. Escribe *asesor* o selecciona la opción 3 del menú."
+    )
+
+
+def ask_employment_message() -> str:
+    """Solicita tipo de empleo."""
+    return "¿Cuál es tu situación laboral? (ej. dependiente, independiente, jubilado)"
+
+
+def ask_expenses_message() -> str:
+    """Solicita gastos mensuales."""
+    return "¿Cuáles son tus gastos mensuales aproximados?"
+
+
+def ask_purpose_message() -> str:
+    """Solicita destino del crédito."""
+    return "¿Para qué destinarías el crédito? (ej. educación, salud, consumo)"
+
+
+def invalid_cedula_message() -> str:
+    """Error de cédula inválida."""
+    return "La cédula no es válida. Verifica los 10 dígitos e inténtalo de nuevo."
+
+
+def cedula_not_found_message() -> str:
+    """Error cuando la cédula no existe en perfiles ficticios."""
+    return "No encontramos un perfil ficticio con esa cédula. Inténtalo de nuevo o pide un asesor."
+
+
+def result_v2_message(data: dict) -> str:
+    """Muestra resultado de precalificación v2."""
+    result_labels = {
+        "preaprobado": "Preaprobado",
+        "observado": "Observado",
+        "no_cumple": "No cumple",
+    }
+    label = result_labels.get(data["result"], data["result"])
+    return (
+        f"Resultado: {label}\n"
+        f"Categoría: {data['category']}\n"
+        f"Monto máximo estimado: ${data['max_amount']:.2f}\n"
+        f"Monto sugerido: ${data['suggested_amount']:.2f}\n"
+        f"Plazo: {data['term']} meses\n"
+        f"TEA: {data['annual_rate'] * 100:.1f}%\n"
+        f"Cuota estimada: ${data['monthly_payment']:.2f}\n"
+        f"Capacidad de pago: ${data['payment_capacity']:.2f}\n\n"
+        "¿Deseas registrar esta precalificación?\n"
+        "1. Sí\n"
+        "2. Hablar con asesor"
+    )
+
+
+def registered_message() -> str:
+    """Confirmación de solicitud registrada."""
+    return (
+        "Solicitud registrada. Un asesor validará la documentación final.\n"
+        "Gracias por usar CrediBot."
+    )
 
 
 def ask_term_message() -> str:

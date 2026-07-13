@@ -78,3 +78,56 @@ def validate_confirmation(value: str) -> tuple[bool, str | None]:
     if cleaned not in {"1", "2"}:
         return False, "Selecciona una opción válida: 1 (Sí) o 2 (No)."
     return True, None
+
+
+def validate_consent(value: str) -> tuple[bool, str | None]:
+    """Valida aceptación de consentimiento."""
+    cleaned = value.strip().lower()
+    if cleaned in {"1", "si", "sí", "acepto", "aceptar"}:
+        return True, None
+    if cleaned in {"2", "no", "rechazo", "rechazar"}:
+        return True, None
+    return False, "Responde 1 para aceptar o 2 para rechazar."
+
+
+def is_consent_accepted(value: str) -> bool:
+    """Indica si el usuario aceptó el consentimiento."""
+    return value.strip().lower() in {"1", "si", "sí", "acepto", "aceptar"}
+
+
+def validate_cedula_input(value: str) -> tuple[bool, str | None]:
+    """Valida cédula ecuatoriana con módulo 10."""
+    from app.domain.cedula_validator import validate_cedula
+
+    is_valid, error_code = validate_cedula(value)
+    if not is_valid:
+        messages = {
+            "invalid_length": "La cédula debe tener 10 dígitos.",
+            "invalid_format": "La cédula solo debe contener números.",
+            "invalid_province": "Los dos primeros dígitos no corresponden a una provincia válida.",
+            "invalid_person_type": "El tercer dígito no es válido para persona natural.",
+            "invalid_check_digit": "El dígito verificador de la cédula no es correcto.",
+        }
+        return False, messages.get(error_code, "Cédula inválida.")
+    return True, None
+
+
+def validate_expenses(value: str) -> tuple[bool, str | None]:
+    """Valida gastos mensuales (número >= 0)."""
+    try:
+        expenses = parse_numeric_value(value)
+    except ValueError:
+        return False, "Los gastos deben ser un número válido."
+
+    if expenses < 0:
+        return False, "Los gastos no pueden ser negativos."
+
+    return True, None
+
+
+def validate_text_field(value: str, min_length: int = 3) -> tuple[bool, str | None]:
+    """Valida campos de texto libre con longitud mínima."""
+    cleaned = value.strip()
+    if len(cleaned) < min_length:
+        return False, f"La respuesta debe tener al menos {min_length} caracteres."
+    return True, None

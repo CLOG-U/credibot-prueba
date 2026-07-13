@@ -483,11 +483,11 @@ El MVP se considera completo cuando:
 | Sprint | Tareas P0 | Hechas | Pendientes |
 |---|---|---|---|
 | Preparación + EPIC-00 | 8 | 3 | 5 |
-| Sprint 1 — Datos y dominio | 35 | 21 | 14 |
+| Sprint 1 — Datos y dominio | 35 | 35 | 0 |
 | Sprint 2 — Tools, GPT, RAG | 28 | 0 | 28 |
 | Sprint 3 — WhatsApp, Redis, Admin | 29 | 0 | 29 |
 | Sprint 4 — DevOps y QA | 30 | 0 | 30 |
-| **Total v2** | **~130** | **24** | **~106** |
+| **Total v2** | **~130** | **38** | **~92** |
 
 ---
 
@@ -537,15 +537,15 @@ El MVP se considera completo cuando:
 
 ## EPIC-03 — Flujo y estado (Sprint 1)
 
-- [ ] **FLOW-01** — Definir estados y transiciones v2 (P0)
-- [ ] **FLOW-02** — Añadir consentimiento antes de cédula (P0)
-- [ ] **FLOW-03** — Añadir verificación de cédula e identidad (P0)
-- [ ] **FLOW-04** — Evaluar elegibilidad antes del monto (P0)
-- [ ] **FLOW-05** — Recopilar empleo, gastos, plazo y destino (P0)
-- [ ] **FLOW-06** — Mantener asesor disponible en todo estado (P0)
-- [ ] **FLOW-07** — Persistir fallos de validación (P0)
-- [ ] **FLOW-08** — Recuperar conversación después de reinicio (P0)
-- [ ] **FLOW-09** — Probar aislamiento entre usuarios (P0)
+- [x] **FLOW-01** — Definir estados y transiciones v2 (P0)
+- [x] **FLOW-02** — Añadir consentimiento antes de cédula (P0)
+- [x] **FLOW-03** — Añadir verificación de cédula e identidad (P0)
+- [x] **FLOW-04** — Evaluar elegibilidad antes del monto (P0)
+- [x] **FLOW-05** — Recopilar empleo, gastos, plazo y destino (P0)
+- [x] **FLOW-06** — Mantener asesor disponible en todo estado (P0)
+- [x] **FLOW-07** — Persistir fallos de validación (P0)
+- [x] **FLOW-08** — Recuperar conversación después de reinicio (P0)
+- [x] **FLOW-09** — Probar aislamiento entre usuarios (P0)
 
 **Criterio Sprint 1:** simulador completa flujo v2 sin GPT.
 
@@ -609,5 +609,6 @@ El MVP se considera completo cuando:
 
 | Commit | Tarea(s) | Descripción | Fecha |
 |---|---|---|---|
+| 3 | FLOW-01..09 | Flujo conversacional v2 sin GPT | 2026-07-12 |
 | 2 | DOM-01..09 | Dominio crediticio y validador de cédula | 2026-07-12 |
 | 1 | GOV-01,05 DATA-01..11 | Migraciones v2, seed y ADR arquitectura | 2026-07-12 |

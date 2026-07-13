@@ -95,17 +95,99 @@ def save_result(
     estimated_payment: float,
     payment_capacity: float,
     result: str,
+    **extra_fields: Any,
 ) -> dict[str, Any]:
     """Guarda el resultado de la evaluación y marca la solicitud como completada."""
+    payload: dict[str, Any] = {
+        "estimated_payment": estimated_payment,
+        "payment_capacity": payment_capacity,
+        "result": result,
+        "status": "completed",
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+    payload.update(extra_fields)
+
+    response = (
+        get_supabase_client()
+        .table("credit_requests")
+        .update(payload)
+        .eq("id", request_id)
+        .execute()
+    )
+    return response.data[0]
+
+
+def update_profile_data(
+    request_id: str,
+    cedula: str,
+    credit_score: int,
+    score_category: str,
+    full_name: str,
+) -> dict[str, Any]:
+    """Guarda datos del perfil crediticio en la solicitud."""
     response = (
         get_supabase_client()
         .table("credit_requests")
         .update(
             {
-                "estimated_payment": estimated_payment,
-                "payment_capacity": payment_capacity,
-                "result": result,
-                "status": "completed",
+                "cedula": cedula,
+                "credit_score": credit_score,
+                "score_category": score_category,
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+            }
+        )
+        .eq("id", request_id)
+        .execute()
+    )
+    user_id = response.data[0]["user_id"]
+    get_supabase_client().table("users").update({"full_name": full_name}).eq(
+        "id", user_id
+    ).execute()
+    return response.data[0]
+
+
+def update_employment(request_id: str, employment_type: str) -> dict[str, Any]:
+    """Actualiza tipo de empleo."""
+    response = (
+        get_supabase_client()
+        .table("credit_requests")
+        .update(
+            {
+                "employment_type": employment_type,
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+            }
+        )
+        .eq("id", request_id)
+        .execute()
+    )
+    return response.data[0]
+
+
+def update_expenses(request_id: str, monthly_expenses: float) -> dict[str, Any]:
+    """Actualiza gastos mensuales."""
+    response = (
+        get_supabase_client()
+        .table("credit_requests")
+        .update(
+            {
+                "monthly_expenses": monthly_expenses,
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+            }
+        )
+        .eq("id", request_id)
+        .execute()
+    )
+    return response.data[0]
+
+
+def update_purpose(request_id: str, loan_purpose: str) -> dict[str, Any]:
+    """Actualiza destino del crédito."""
+    response = (
+        get_supabase_client()
+        .table("credit_requests")
+        .update(
+            {
+                "loan_purpose": loan_purpose,
                 "updated_at": datetime.now(timezone.utc).isoformat(),
             }
         )

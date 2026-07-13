@@ -91,3 +91,37 @@ def finish_conversation(conversation_id: str) -> dict[str, Any]:
         .execute()
     )
     return response.data[0]
+
+
+def increment_validation_failures(conversation_id: str) -> int:
+    """Incrementa y retorna el contador de fallos de validación."""
+    response = (
+        get_supabase_client()
+        .table("conversations")
+        .select("validation_failures")
+        .eq("id", conversation_id)
+        .limit(1)
+        .execute()
+    )
+    current = 0
+    if response.data:
+        current = response.data[0].get("validation_failures") or 0
+
+    new_count = current + 1
+    get_supabase_client().table("conversations").update(
+        {
+            "validation_failures": new_count,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+    ).eq("id", conversation_id).execute()
+    return new_count
+
+
+def reset_validation_failures(conversation_id: str) -> None:
+    """Reinicia el contador de fallos de validación."""
+    get_supabase_client().table("conversations").update(
+        {
+            "validation_failures": 0,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+    ).eq("id", conversation_id).execute()

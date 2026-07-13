@@ -47,3 +47,24 @@ def update_user_name(user_id: str, full_name: str) -> dict[str, Any]:
         .execute()
     )
     return response.data[0]
+
+
+def update_user_consent(user_id: str, cedula: str | None = None) -> dict[str, Any]:
+    """Registra consentimiento de datos del usuario."""
+    from datetime import datetime, timezone
+
+    payload: dict[str, Any] = {
+        "consent_given": True,
+        "consent_at": datetime.now(timezone.utc).isoformat(),
+    }
+    if cedula:
+        payload["cedula"] = cedula
+
+    response = (
+        get_supabase_client()
+        .table("users")
+        .update(payload)
+        .eq("id", user_id)
+        .execute()
+    )
+    return response.data[0]
