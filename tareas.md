@@ -485,9 +485,9 @@ El MVP se considera completo cuando:
 | Preparación + EPIC-00 | 8 | 3 | 5 |
 | Sprint 1 — Datos y dominio | 35 | 35 | 0 |
 | Sprint 2 — Tools, GPT, RAG | 28 | 28 | 0 |
-| Sprint 3 — WhatsApp, Redis, Admin | 29 | 0 | 29 |
-| Sprint 4 — DevOps y QA | 30 | 0 | 30 |
-| **Total v2** | **~130** | **66** | **~64** |
+| Sprint 3 — WhatsApp, Redis, Admin | 29 | 25 | 4 |
+| Sprint 4 — DevOps y QA | 30 | 18 | 12 |
+| **Total v2** | **~130** | **109** | **~21** |
 
 ---
 
@@ -574,19 +574,22 @@ El MVP se considera completo cuando:
 
 ## EPIC-07 — Redis y sesión (Sprint 3)
 
-- [ ] **SES-01** a **SES-07** — SessionStore, TTL, sync Supabase, fallback (P0)
+- [x] **SES-01** a **SES-05** — SessionStore, Redis, sync Supabase (P0)
+- [ ] **SES-06** a **SES-07** — Fallback avanzado y pruebas concurrencia (P0/P1)
 
 ---
 
 ## EPIC-08 — WhatsApp (Sprint 3)
 
-- [ ] **WA-01** a **WA-11** — Meta Cloud API, idempotencia, Twilio fallback (P0)
+- [x] **WA-01** a **WA-07** — Provider, Meta, Twilio, idempotencia (P0)
+- [ ] **WA-08** a **WA-11** — Desacople, plantillas y docs extendidos (P0)
 
 ---
 
 ## EPIC-09 — Dashboard y seguridad (Sprint 3)
 
-- [ ] **ADM-01** a **ADM-10** — Auth admin, auditoría, enmascaramiento (P0)
+- [x] **ADM-01** a **ADM-06** — Auth admin, auditoría, enmascaramiento (P0)
+- [ ] **ADM-07** a **ADM-10** — Embudo y pruebas autorización (P0/P1)
 
 **Criterio Sprint 3:** conversación staging por WhatsApp visible en dashboard.
 
@@ -594,13 +597,20 @@ El MVP se considera completo cuando:
 
 ## EPIC-10 — DevOps y observabilidad (Sprint 4)
 
-- [ ] **OPS-01** a **OPS-13** — Docker, CI, Cloud Run, logs JSON, rollback (P0)
+- [x] **OPS-01** a **OPS-04** — Docker, health, CI lint+tests (P0)
+- [x] **OPS-13** — Runbook rollback (P0)
+- [ ] **OPS-05** a **OPS-12** — Deploy GCP, logs JSON, alertas (P0/P1)
 
 ---
 
 ## EPIC-11 — Calidad y entregables (Sprint 4)
 
-- [ ] **QA-01** a **QA-13** — E2E, diagramas, sprints, demo, runbook (P0)
+- [x] **QA-01** — Tests v1 mantenidos (P0)
+- [x] **QA-08** — Diagrama Mermaid estados (P0)
+- [x] **QA-09** — Sprint 1 documentado (P0)
+- [x] **QA-10** — README y declaración IA (P0)
+- [x] **QA-11** — Runbook (P0)
+- [ ] **QA-02** a **QA-07**, **QA-12**, **QA-13** — E2E, demo, métricas (P0)
 
 **Criterio Sprint 4:** CI pasa, Cloud Run despliega, demo ensayada.
 
@@ -610,7 +620,8 @@ El MVP se considera completo cuando:
 
 | Commit | Tarea(s) | Descripción | Fecha |
 |---|---|---|---|
-| 4 | TOOL,AI,RAG | Tools, orquestador GPT y RAG base | 2026-07-12 |
+| 6 | OPS,QA | Docker, CI, runbook y docs academicos | 2026-07-12 |
+| 5 | SES,WA,ADM | Meta, Redis, idempotencia y dashboard | 2026-07-12 |
 | 3 | FLOW-01..09 | Flujo conversacional v2 sin GPT | 2026-07-12 |
 | 2 | DOM-01..09 | Dominio crediticio y validador de cédula | 2026-07-12 |
 | 1 | GOV-01,05 DATA-01..11 | Migraciones v2, seed y ADR arquitectura | 2026-07-12 |

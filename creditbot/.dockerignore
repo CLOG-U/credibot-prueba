@@ -1,0 +1,10 @@
+.env
+.env.*
+__pycache__
+*.pyc
+.pytest_cache
+.git
+dashboard/
+contexto aplicacion/
+*.md
+!app/rag/documents/*.md

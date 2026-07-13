@@ -11,10 +11,7 @@ from app.core.constants import (
     CONFIRM,
     FINISHED,
     HANDOFF_REQUESTED,
-    MENU,
-    NOT_ELIGIBLE,
     SHOW_RESULT,
-    START,
 )
 
 TERMINAL_STATES = {HANDOFF_REQUESTED, FINISHED}

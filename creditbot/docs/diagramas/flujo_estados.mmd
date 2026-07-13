@@ -1,0 +1,19 @@
+stateDiagram-v2
+    [*] --> START
+    START --> MENU : primer mensaje
+    MENU --> CONSENTIMIENTO : opción precalificar
+    MENU --> HANDOFF : opción asesor
+    CONSENTIMIENTO --> ASK_CEDULA : acepta
+    CONSENTIMIENTO --> MENU : rechaza
+    ASK_CEDULA --> ASK_INCOME : perfil elegible
+    ASK_CEDULA --> NOT_ELIGIBLE : no elegible
+    ASK_INCOME --> ASK_EMPLOYMENT
+    ASK_EMPLOYMENT --> ASK_EXPENSES
+    ASK_EXPENSES --> ASK_TERM
+    ASK_TERM --> ASK_PURPOSE
+    ASK_PURPOSE --> CONFIRM : cálculo
+    CONFIRM --> FINISHED : confirma
+    CONFIRM --> HANDOFF : pide asesor
+    NOT_ELIGIBLE --> HANDOFF
+    HANDOFF --> [*]
+    FINISHED --> [*]

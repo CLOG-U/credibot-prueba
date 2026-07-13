@@ -1,29 +1,31 @@
-# CrediBot
+# CrediBot v2
 
-Agente conversacional de precalificación de crédito por WhatsApp.
+Agente conversacional de **precalificación** de crédito por WhatsApp (no aprobación ni desembolso).
 
-**Stack:** Python, FastAPI, Supabase, Twilio WhatsApp.
+**Stack v2:** Python 3.12, FastAPI, Supabase, Redis, OpenAI GPT, Meta WhatsApp Cloud API, Streamlit, Docker, GitHub Actions, Google Cloud Run.
 
-CrediBot guía al usuario paso a paso, valida datos, calcula una precalificación básica (`preaprobado`, `observado`, `no_cumple`), registra la información en Supabase y deriva a un asesor humano cuando corresponde.
+## Declaración de uso de IA
 
-## Estructura del proyecto
+- **OpenAI GPT** se usa para conversación natural y orquestación de tools (opcional, `ENABLE_GPT_AGENT=true`).
+- Las decisiones de elegibilidad y montos las ejecutan reglas en `app/domain/credit_rules.py` (no el LLM).
+- Los perfiles crediticios son **datos ficticios** generados para fines académicos.
+- Este README, migraciones y documentación fueron elaborados con asistencia de IA y revisión del equipo.
+
+## Arquitectura v2
 
 ```text
 creditbot/
 ├── app/
-│   ├── main.py
-│   ├── core/
-│   ├── api/
-│   ├── schemas/
-│   ├── services/
-│   ├── repositories/
-│   └── tests/
-├── docs/
-├── supabase/
-├── requirements.txt
-├── .env.example
-├── Procfile
-└── render.yaml
+│   ├── agent/          # Orquestador GPT y state manager
+│   ├── domain/         # Reglas crediticias y cédula
+│   ├── tools/          # Tools auditables
+│   ├── rag/            # Políticas y retriever
+│   ├── providers/      # OpenAI, WhatsApp Meta/Twilio
+│   ├── session/        # Redis / fallback
+│   └── ...
+├── infra/Dockerfile
+├── supabase/migrations/
+└── docs/
 ```
 
 ## Requisitos

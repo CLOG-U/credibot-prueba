@@ -23,12 +23,8 @@ class MockLLMProvider(LLMProvider):
         messages: list[dict[str, str]],
         tools: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
-        last_user = next(
-            (m["content"] for m in reversed(messages) if m["role"] == "user"),
-            "",
-        )
         return {
-            "content": f"[modo simulado] Recibí tu mensaje. El flujo determinista continúa.",
+            "content": "[modo simulado] Recibí tu mensaje. El flujo determinista continúa.",
             "tool_calls": [],
             "usage": {"total_tokens": 0},
         }

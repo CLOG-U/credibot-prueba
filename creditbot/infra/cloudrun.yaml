@@ -1,0 +1,18 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: credibot
+spec:
+  template:
+    spec:
+      containers:
+        - image: REGION-docker.pkg.dev/PROJECT_ID/credibot/credibot:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: APP_ENV
+              value: production
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
