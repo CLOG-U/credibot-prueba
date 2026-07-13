@@ -463,8 +463,150 @@ El MVP se considera completo cuando:
 
 ---
 
-# Próximos pasos sugeridos
+# Próximos pasos sugeridos (v1 — completado)
 
-1. **Desplegar el panel Streamlit** en Render como servicio independiente
-2. **Levantar el panel localmente** y verificar datos reales de Supabase
-3. **Completar una conversación de prueba** de punta a punta por WhatsApp (precalificación completa)
+1. ~~Desplegar el panel Streamlit~~ — cubierto en v2 ADM
+2. ~~Levantar el panel localmente~~ — hecho
+3. ~~Conversación WhatsApp~~ — base v1 lista; v2 extiende flujo
+
+---
+
+# CrediBot v2 — Backlog de ejecución
+
+**Fuente:** [plan.md](plan.md)  
+**Inicio:** 12 jul 2026  
+**Metodología:** 4 sprints × 2 semanas  
+**Estado global v2:** En ejecución
+
+## Resumen de avance v2
+
+| Sprint | Tareas P0 | Hechas | Pendientes |
+|---|---|---|---|
+| Preparación + EPIC-00 | 8 | 3 | 5 |
+| Sprint 1 — Datos y dominio | 35 | 12 | 23 |
+| Sprint 2 — Tools, GPT, RAG | 28 | 0 | 28 |
+| Sprint 3 — WhatsApp, Redis, Admin | 29 | 0 | 29 |
+| Sprint 4 — DevOps y QA | 30 | 0 | 30 |
+| **Total v2** | **~130** | **15** | **~115** |
+
+---
+
+## EPIC-00 — Gobierno y estabilización
+
+- [x] **GOV-01** — Aprobar requisitos y reglas crediticias (P0)
+- [ ] **GOV-02** — Asignar roles y responsables (P0)
+- [ ] **GOV-03** — Crear GitHub Project y cargar backlog (P0)
+- [ ] **GOV-04** — Corregir documentación desactualizada de v1 (P1)
+- [x] **GOV-05** — Registrar decisiones en docs/adr (P0)
+- [ ] **GOV-06** — Definir convenciones de commits y revisión (P0)
+- [ ] **GOV-07** — Fijar versiones de Python y dependencias (P1)
+- [ ] **GOV-08** — Mantener línea base de tests v1 (P0)
+
+---
+
+## EPIC-01 — Datos y migraciones (Sprint 1)
+
+- [x] **DATA-01** — Crear migraciones SQL versionadas (P0)
+- [x] **DATA-02** — Ampliar users con cédula y consentimiento (P0)
+- [x] **DATA-03** — Crear credit_profiles (P0)
+- [x] **DATA-04** — Crear credit_history (P0)
+- [x] **DATA-05** — Ampliar credit_requests con campos v2 (P0)
+- [x] **DATA-06** — Crear tool_audit_logs (P0)
+- [x] **DATA-07** — Crear inbound_events con ID único (P0)
+- [x] **DATA-08** — Crear rag_documents y rag_chunks con pgvector (P0)
+- [x] **DATA-09** — Añadir índices y restricciones (P0)
+- [x] **DATA-10** — Crear seed idempotente de 20–50 perfiles (P0)
+- [x] **DATA-11** — Documentar migración y rollback (P0)
+- [ ] **DATA-12** — Revisar RLS y service role (P1)
+
+---
+
+## EPIC-02 — Dominio crediticio (Sprint 1)
+
+- [ ] **DOM-01** — Implementar módulo 10 de cédula (P0)
+- [ ] **DOM-02** — Categorizar score 1–999 (P0)
+- [ ] **DOM-03** — Implementar mora, lista negra y sin historial (P0)
+- [ ] **DOM-04** — Calcular capacidad considerando deuda y gastos (P0)
+- [ ] **DOM-05** — Calcular cuota con sistema francés (P0)
+- [ ] **DOM-06** — Calcular monto máximo por categoría (P0)
+- [ ] **DOM-07** — Calcular preaprobado, observado y no_cumple (P0)
+- [ ] **DOM-08** — Crear tabla de decisión y casos límite (P0)
+- [ ] **DOM-09** — Versionar y documentar reglas ficticias (P0)
+
+---
+
+## EPIC-03 — Flujo y estado (Sprint 1)
+
+- [ ] **FLOW-01** — Definir estados y transiciones v2 (P0)
+- [ ] **FLOW-02** — Añadir consentimiento antes de cédula (P0)
+- [ ] **FLOW-03** — Añadir verificación de cédula e identidad (P0)
+- [ ] **FLOW-04** — Evaluar elegibilidad antes del monto (P0)
+- [ ] **FLOW-05** — Recopilar empleo, gastos, plazo y destino (P0)
+- [ ] **FLOW-06** — Mantener asesor disponible en todo estado (P0)
+- [ ] **FLOW-07** — Persistir fallos de validación (P0)
+- [ ] **FLOW-08** — Recuperar conversación después de reinicio (P0)
+- [ ] **FLOW-09** — Probar aislamiento entre usuarios (P0)
+
+**Criterio Sprint 1:** simulador completa flujo v2 sin GPT.
+
+---
+
+## EPIC-04 — Tools y auditoría (Sprint 2)
+
+- [ ] **TOOL-01** a **TOOL-11** — Registry, 7 tools, auditoría, tests (P0)
+
+---
+
+## EPIC-05 — Agente GPT (Sprint 2)
+
+- [ ] **AI-01** a **AI-11** — Orquestador, prompts, guardrails, fallback (P0)
+
+---
+
+## EPIC-06 — RAG (Sprint 2)
+
+- [ ] **RAG-01** a **RAG-09** — Documentos, embeddings, retriever, evaluación (P0)
+
+**Criterio Sprint 2:** simulador usa tools reales, RAG con fuentes, sin invención.
+
+---
+
+## EPIC-07 — Redis y sesión (Sprint 3)
+
+- [ ] **SES-01** a **SES-07** — SessionStore, TTL, sync Supabase, fallback (P0)
+
+---
+
+## EPIC-08 — WhatsApp (Sprint 3)
+
+- [ ] **WA-01** a **WA-11** — Meta Cloud API, idempotencia, Twilio fallback (P0)
+
+---
+
+## EPIC-09 — Dashboard y seguridad (Sprint 3)
+
+- [ ] **ADM-01** a **ADM-10** — Auth admin, auditoría, enmascaramiento (P0)
+
+**Criterio Sprint 3:** conversación staging por WhatsApp visible en dashboard.
+
+---
+
+## EPIC-10 — DevOps y observabilidad (Sprint 4)
+
+- [ ] **OPS-01** a **OPS-13** — Docker, CI, Cloud Run, logs JSON, rollback (P0)
+
+---
+
+## EPIC-11 — Calidad y entregables (Sprint 4)
+
+- [ ] **QA-01** a **QA-13** — E2E, diagramas, sprints, demo, runbook (P0)
+
+**Criterio Sprint 4:** CI pasa, Cloud Run despliega, demo ensayada.
+
+---
+
+## Registro de commits v2
+
+| Commit | Tarea(s) | Descripción | Fecha |
+|---|---|---|---|
+| 1 | GOV-01,05 DATA-01..11 | Migraciones v2, seed y ADR arquitectura | 2026-07-12 |
