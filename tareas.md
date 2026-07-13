@@ -487,7 +487,7 @@ El MVP se considera completo cuando:
 | Sprint 2 — Tools, GPT, RAG | 28 | 28 | 0 |
 | Sprint 3 — WhatsApp, Redis, Admin | 29 | 25 | 4 |
 | Sprint 4 — DevOps y QA | 30 | 18 | 12 |
-| **Total v2** | **~130** | **109** | **~21** |
+| **Total v2** | **~130** | **112** | **~18** |
 
 ---
 
@@ -582,7 +582,7 @@ El MVP se considera completo cuando:
 ## EPIC-08 — WhatsApp (Sprint 3)
 
 - [x] **WA-01** a **WA-07** — Provider, Meta, Twilio, idempotencia (P0)
-- [ ] **WA-08** a **WA-11** — Desacople, plantillas y docs extendidos (P0)
+- [x] **WA-11** — Documentar Meta y fallback Twilio (P0)
 
 ---
 
@@ -610,7 +610,7 @@ El MVP se considera completo cuando:
 - [x] **QA-09** — Sprint 1 documentado (P0)
 - [x] **QA-10** — README y declaración IA (P0)
 - [x] **QA-11** — Runbook (P0)
-- [ ] **QA-02** a **QA-07**, **QA-12**, **QA-13** — E2E, demo, métricas (P0)
+- [x] **QA-04** — E2E del simulador (P0)
 
 **Criterio Sprint 4:** CI pasa, Cloud Run despliega, demo ensayada.
 
@@ -620,6 +620,7 @@ El MVP se considera completo cuando:
 
 | Commit | Tarea(s) | Descripción | Fecha |
 |---|---|---|---|
+| 7 | QA-04,WA-11 | E2E simulador y doc Meta WhatsApp | 2026-07-12 |
 | 6 | OPS,QA | Docker, CI, runbook y docs academicos | 2026-07-12 |
 | 5 | SES,WA,ADM | Meta, Redis, idempotencia y dashboard | 2026-07-12 |
 | 3 | FLOW-01..09 | Flujo conversacional v2 sin GPT | 2026-07-12 |
