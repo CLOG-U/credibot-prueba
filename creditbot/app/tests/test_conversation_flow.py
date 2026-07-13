@@ -196,7 +196,7 @@ def test_conversation_flow_v2_excellent(
     ), patch(
         "app.services.conversation_service.conversation_repository.finish_conversation",
         return_value=_base_conversation(FINISHED),
-    ):
+    ), patch("app.core.config.settings.enable_gpt_agent", False):
         assert "precalificación" in process_message("593999999999", "Hola").lower()
         assert "aceptas" in process_message("593999999999", "1").lower()
         mock_create_draft.assert_called_once()

@@ -5,10 +5,12 @@ from typing import Any
 INJECTION_PATTERNS = [
     r"ignora\s+las\s+instrucciones",
     r"system\s+prompt",
+    r"revela\s+tu\s+prompt",
     r"act[uú]a\s+como\s+administrador",
     r"clave\s+de\s+supabase",
     r"api\s*key",
     r"cambia\s+mi\s+resultado",
+    r"score\s+de\s+otros",
     r"apru[eé]bame",
 ]
 

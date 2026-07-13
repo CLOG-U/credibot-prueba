@@ -129,7 +129,7 @@ def test_e2e_simulator_v2_flow(
     ), patch(
         "app.services.conversation_service.conversation_repository.finish_conversation",
         return_value=conv("u1"),
-    ):
+    ), patch("app.core.config.settings.enable_gpt_agent", False):
         assert _post("Hola").status_code == 200
         assert _post("1").status_code == 200
         assert _post("1").status_code == 200
