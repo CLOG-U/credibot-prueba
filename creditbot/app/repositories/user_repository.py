@@ -49,6 +49,21 @@ def update_user_name(user_id: str, full_name: str) -> dict[str, Any]:
     return response.data[0]
 
 
+def _cedula_belongs_to_other_user(cedula: str, user_id: str) -> bool:
+    """Verifica si la cédula ya está asignada a otro usuario."""
+    response = (
+        get_supabase_client()
+        .table("users")
+        .select("id")
+        .eq("cedula", cedula)
+        .limit(1)
+        .execute()
+    )
+    if not response.data:
+        return False
+    return response.data[0]["id"] != user_id
+
+
 def update_user_consent(user_id: str, cedula: str | None = None) -> dict[str, Any]:
     """Registra consentimiento de datos del usuario."""
     from datetime import datetime, timezone
@@ -57,7 +72,7 @@ def update_user_consent(user_id: str, cedula: str | None = None) -> dict[str, An
         "consent_given": True,
         "consent_at": datetime.now(timezone.utc).isoformat(),
     }
-    if cedula:
+    if cedula and not _cedula_belongs_to_other_user(cedula, user_id):
         payload["cedula"] = cedula
 
     response = (
