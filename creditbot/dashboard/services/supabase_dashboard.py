@@ -79,3 +79,16 @@ def probar_conexion() -> bool:
     get_supabase_client().table("users").select("id").limit(1).execute()
     return True
 
+
+def get_tool_audit_logs(limit: int = 100) -> list[dict[str, Any]]:
+    """Obtiene auditoría de tools."""
+    response = (
+        get_supabase_client()
+        .table("tool_audit_logs")
+        .select("*")
+        .order("created_at", desc=True)
+        .limit(limit)
+        .execute()
+    )
+    return response.data or []
+

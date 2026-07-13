@@ -1,12 +1,17 @@
-"""Rutas del webhook de WhatsApp (Twilio)."""
+"""Rutas del webhook de WhatsApp (Twilio y Meta)."""
 import logging
 
-from fastapi import APIRouter, HTTPException, Request, Response
+from fastapi import APIRouter, HTTPException, Query, Request, Response
 
 from app.core.config import settings
+from app.providers.whatsapp.factory import get_whatsapp_provider
+from app.providers.whatsapp.meta_cloud import MetaWhatsAppProvider
+from app.repositories import inbound_events_repository
 from app.schemas.whatsapp import extract_twilio_message
 from app.services.conversation_service import process_message
-from app.services.whatsapp_service import WhatsAppServiceError, send_text_message
+from app.services.whatsapp_service import WhatsAppServiceError
+from app.session.session_store import sync_session_from_conversation
+from app.repositories import conversation_repository, user_repository
 
 logger = logging.getLogger(__name__)
 
@@ -43,21 +48,87 @@ def _validate_twilio_signature(request: Request, form_data: dict[str, str]) -> N
 
 
 @router.get("/whatsapp")
-def whatsapp_webhook_status():
-    """Endpoint GET de verificación del webhook de Twilio."""
+def whatsapp_webhook_verify(
+    request: Request,
+    hub_mode: str | None = Query(None, alias="hub.mode"),
+    hub_verify_token: str | None = Query(None, alias="hub.verify_token"),
+    hub_challenge: str | None = Query(None, alias="hub.challenge"),
+):
+    """Verificación GET para Meta o estado para Twilio."""
+    if hub_mode == "subscribe":
+        if hub_verify_token != settings.meta_verify_token:
+            raise HTTPException(status_code=403, detail="Token de verificación inválido")
+        return Response(content=hub_challenge or "", media_type="text/plain")
+
+    provider = get_whatsapp_provider()
     return {
         "status": "ok",
-        "provider": "twilio",
-        "message": "Configura esta URL en Twilio Console como webhook entrante.",
+        "provider": provider.name,
+        "message": "Webhook activo para WhatsApp.",
     }
+
+
+async def _process_inbound(incoming: dict) -> None:
+    """Procesa mensaje entrante con idempotencia y sesión."""
+    provider_name = incoming.get("provider", settings.whatsapp_provider)
+    message_id = incoming.get("message_id")
+    phone = incoming["phone"]
+    message = incoming["message"]
+    raw_payload = incoming.get("raw_payload")
+
+    try:
+        if inbound_events_repository.is_duplicate_event(provider_name, message_id or ""):
+            logger.info("Mensaje duplicado descartado: %s", message_id)
+            return
+    except Exception:
+        pass
+
+    reply = process_message(phone, message, raw_payload=raw_payload)
+
+    try:
+        user = user_repository.get_or_create_user(phone)
+        conversation = conversation_repository.get_or_create_active_conversation(user["id"])
+        sync_session_from_conversation(conversation)
+    except Exception:
+        pass
+
+    provider = get_whatsapp_provider()
+    try:
+        provider.send_text(phone, reply)
+    except (WhatsAppServiceError, ValueError) as exc:
+        logger.error("No se pudo enviar mensaje a %s: %s", phone, exc)
+
+    try:
+        inbound_events_repository.register_event(
+            provider_name,
+            message_id or f"no-id-{phone}-{hash(message)}",
+            phone=phone,
+            payload=raw_payload,
+        )
+    except Exception:
+        pass
 
 
 @router.post("/whatsapp")
 async def receive_whatsapp_webhook(request: Request):
-    """Recibe mensajes entrantes de Twilio, los procesa y responde."""
+    """Recibe mensajes de Twilio o Meta."""
+    content_type = request.headers.get("content-type", "")
+
+    if "application/json" in content_type:
+        raw_body = await request.body()
+        signature = request.headers.get("X-Hub-Signature-256", "")
+        if not MetaWhatsAppProvider.validate_signature(raw_body, signature):
+            raise HTTPException(status_code=403, detail="Firma Meta inválida")
+
+        payload = await request.json()
+        provider = MetaWhatsAppProvider()
+        incoming = provider.parse_inbound(payload)
+        if incoming:
+            await _process_inbound(incoming)
+        return {"status": "ok"}
+
     form = await request.form()
     form_data = {key: str(value) for key, value in form.items()}
-
     _validate_twilio_signature(request, form_data)
 
     incoming = extract_twilio_message(
@@ -65,18 +136,9 @@ async def receive_whatsapp_webhook(request: Request):
         form_data.get("Body", ""),
         form_data.get("MessageSid") or None,
     )
-    if not incoming:
-        return Response(content="", media_type="text/plain")
-
-    phone = incoming["phone"]
-    message = incoming["message"]
-    raw_payload = incoming["raw_payload"]
-
-    reply = process_message(phone, message, raw_payload=raw_payload)
-
-    try:
-        send_text_message(phone, reply)
-    except WhatsAppServiceError as exc:
-        logger.error("No se pudo enviar mensaje a %s: %s", phone, exc)
+    if incoming:
+        incoming["provider"] = "twilio"
+        incoming["message_id"] = incoming.get("message_id") or form_data.get("MessageSid")
+        await _process_inbound(incoming)
 
     return Response(content="", media_type="text/plain")

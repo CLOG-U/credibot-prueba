@@ -553,19 +553,20 @@ El MVP se considera completo cuando:
 
 ## EPIC-04 — Tools y auditoría (Sprint 2)
 
-- [ ] **TOOL-01** a **TOOL-11** — Registry, 7 tools, auditoría, tests (P0)
+- [x] **TOOL-01** a **TOOL-11** — Registry, tools, auditoría y tests (P0)
 
 ---
 
 ## EPIC-05 — Agente GPT (Sprint 2)
 
-- [ ] **AI-01** a **AI-11** — Orquestador, prompts, guardrails, fallback (P0)
+- [x] **AI-01** a **AI-11** — Orquestador, prompts, guardrails y fallback (P0)
 
 ---
 
 ## EPIC-06 — RAG (Sprint 2)
 
-- [ ] **RAG-01** a **RAG-09** — Documentos, embeddings, retriever, evaluación (P0)
+- [x] **RAG-01** a **RAG-06** — Documentos, chunking, retriever y fuentes (P0)
+- [ ] **RAG-07** a **RAG-09** — Evaluación extendida y cache (P0/P2)
 
 **Criterio Sprint 2:** simulador usa tools reales, RAG con fuentes, sin invención.
 
