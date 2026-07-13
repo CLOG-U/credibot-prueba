@@ -76,12 +76,16 @@ async def _process_inbound(incoming: dict) -> None:
     message = incoming["message"]
     raw_payload = incoming.get("raw_payload")
 
-    try:
-        if inbound_events_repository.is_duplicate_event(provider_name, message_id or ""):
+    if message_id:
+        claimed = inbound_events_repository.try_claim_event(
+            provider_name,
+            message_id,
+            phone=phone,
+            payload=raw_payload,
+        )
+        if not claimed:
             logger.info("Mensaje duplicado descartado: %s", message_id)
             return
-    except Exception:
-        pass
 
     reply = process_message(phone, message, raw_payload=raw_payload)
 
@@ -97,16 +101,6 @@ async def _process_inbound(incoming: dict) -> None:
         provider.send_text(phone, reply)
     except (WhatsAppServiceError, ValueError) as exc:
         logger.error("No se pudo enviar mensaje a %s: %s", phone, exc)
-
-    try:
-        inbound_events_repository.register_event(
-            provider_name,
-            message_id or f"no-id-{phone}-{hash(message)}",
-            phone=phone,
-            payload=raw_payload,
-        )
-    except Exception:
-        pass
 
 
 @router.post("/whatsapp")

@@ -20,20 +20,41 @@ def is_duplicate_event(provider: str, external_message_id: str) -> bool:
     return bool(response.data)
 
 
+def try_claim_event(
+    provider: str,
+    external_message_id: str,
+    phone: str | None = None,
+    payload: dict[str, Any] | None = None,
+) -> bool:
+    """
+    Reserva el evento antes de procesarlo.
+    Retorna True si este worker puede procesarlo; False si ya fue reclamado.
+    """
+    if not external_message_id:
+        return True
+
+    if is_duplicate_event(provider, external_message_id):
+        return False
+
+    try:
+        get_supabase_client().table("inbound_events").insert(
+            {
+                "provider": provider,
+                "external_message_id": external_message_id,
+                "phone": phone,
+                "payload": payload,
+            }
+        ).execute()
+        return True
+    except Exception:
+        return False
+
+
 def register_event(
     provider: str,
     external_message_id: str,
     phone: str | None = None,
     payload: dict[str, Any] | None = None,
 ) -> None:
-    """Registra mensaje procesado."""
-    if not external_message_id:
-        return
-    get_supabase_client().table("inbound_events").insert(
-        {
-            "provider": provider,
-            "external_message_id": external_message_id,
-            "phone": phone,
-            "payload": payload,
-        }
-    ).execute()
+    """Registra mensaje procesado (compatibilidad)."""
+    try_claim_event(provider, external_message_id, phone=phone, payload=payload)
